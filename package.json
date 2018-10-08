@@ -1,0 +1,50 @@
+{
+  "name": "tygit",
+  "version": "0.1.0",
+  "description": "",
+  "main": "build/index.js",
+  "bin": {
+    "tygit": "build/index.js"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "pretty": "prettier --config .prettierrc --write \"src/fn/*.ts\" \"src/*.ts\" ",
+    "lint": "tslint -c tslint.json 'src/**/*.ts'",
+    "fix-lint": "tslint --fix -c tslint.json 'src/**/*.ts'",
+    "build": "tsc"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/vaheqelyan/tygit.git"
+  },
+  "keywords": [
+    "git",
+    "cli"
+  ],
+  "files": [
+    "build/**/*",
+    "build/*"
+  ],
+  "author": "vaheqelyan <vahe.araqelyan.2013@hotmail.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/vaheqelyan/tygit/issues"
+  },
+  "homepage": "https://github.com/vaheqelyan/tygit#readme",
+  "dependencies": {
+    "blessed": "^0.1.81",
+    "fuzzysearch": "^1.0.3",
+    "minimist": "^1.2.0",
+    "reflect-metadata": "^0.1.12",
+    "simple-git": "^1.102.0",
+    "typedi": "^0.8.0"
+  },
+  "devDependencies": {
+    "@types/blessed": "^0.1.10",
+    "@types/minimist": "^1.2.0",
+    "@types/node": "^10.10.1",
+    "tslint": "^5.11.0",
+    "tslint-config-prettier": "^1.15.0",
+    "typescript": "^3.1.1"
+  }
+}
