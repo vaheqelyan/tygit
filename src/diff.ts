@@ -1,0 +1,84 @@
+import * as blessed from "blessed";
+import { Inject, Service } from "typedi";
+import Git from "./git";
+import Screen from "./screen";
+import Status from "./status";
+
+@Service()
+class Diff {
+	public element: blessed.Widgets.BoxElement;
+
+	@Inject(() => Status)
+	public statusFactory: Status;
+	@Inject() public gitFactory: Git;
+	@Inject(() => Screen)
+	public screenFactory: Screen;
+
+	public diffOnFocus() {
+		const selected = this.statusFactory.getSelected();
+		if (selected) {
+			const getFileName = this.statusFactory.getSelectedFileName();
+			if (this.gitFactory.diffs.has(getFileName)) {
+				this.element.setContent(this.gitFactory.diffs.get(getFileName));
+			}
+		}
+	}
+
+	public appendAndRender() {
+		this.element = this.createElement();
+		this.screenFactory.screen.append(this.element);
+		this.screenFactory.screen.render();
+	}
+	public reload() {
+		const fileName = this.statusFactory.getSelectedFileName();
+		if (fileName) {
+			if (this.gitFactory.diffs.has(fileName)) {
+				this.element.setContent(this.gitFactory.diffs.get(fileName));
+			}
+		}
+	}
+	public createElement() {
+		const el = blessed.box({
+			alwaysScroll: true,
+			border: {
+				type: "line",
+			},
+			content: ``,
+			height: "95%",
+			keys: true,
+			label: "Diff",
+			left: "30%",
+			mouse: true,
+			right: 0,
+			scrollable: true,
+			scrollbar: {
+				ch: " ",
+			},
+			style: {
+				bg: "default",
+				border: {
+					fg: "#f0f0f0",
+				},
+				fg: "white",
+				hover: {
+					bg: "green",
+				},
+			},
+			tags: true,
+			top: 0,
+			width: "69%",
+		});
+
+		return el;
+	}
+	public getElement() {
+		return this.element;
+	}
+
+	public appendToScreen() {
+		this.element = this.createElement();
+		this.screenFactory.screen.append(this.element);
+	}
+}
+
+export default Diff;
