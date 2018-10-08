@@ -8,7 +8,6 @@ import Git from "./git";
 import StatusBar from "./statusBar";
 
 import * as fuzzysearch from "fuzzysearch";
-import buildStatusArray from "./fn/buildStatusArray";
 import MergePrompt from "./mergePrompt";
 import Message from "./message";
 import MSG from "./messages/statusBar";
