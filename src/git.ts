@@ -131,7 +131,7 @@ class Git {
 	}
 
 	public commit(message: string, handleExec: () => void, handleExecError: (err: string) => void) {
-		this.runCmd(["commit", "-m", `"${message}"`], err => {
+		this.runCmd(["commit", "-m", `${message}`], err => {
 			if (err) {
 				handleExecError(err.message.toString());
 				return;
@@ -141,7 +141,7 @@ class Git {
 	}
 
 	public commitFile(message: string, fileName: string, handleExec: () => void, handleExecError: (err: string) => void) {
-		this.runCmd(["commit", "-m", `"${message}"`, fileName], err => {
+		this.runCmd(["commit", "-m", `${message}`, fileName], err => {
 			if (err) {
 				handleExecError(err.message.toString());
 				return;
