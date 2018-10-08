@@ -1,7 +1,7 @@
 {
   "name": "tygit",
   "version": "0.1.0",
-  "description": "",
+  "description": "A terminal interface for git",
   "main": "build/index.js",
   "bin": {
     "tygit": "build/index.js"
@@ -19,7 +19,9 @@
   },
   "keywords": [
     "git",
-    "cli"
+    "cli",
+    "terminal",
+    "interface"
   ],
   "files": [
     "build/**/*",
