@@ -58,20 +58,9 @@ class CommitFileInput extends Prompt {
 			}
 			this.gitFactory.diffSummary = res;
 			this.statusBarFactory.resetContent();
-			// setTimeout(() => {
-			// 	this.statusBarFactory.element.setContent(
-			// 		writeFooterContent(
-			// 			this.gitFactory.branches.current,
-			// 			this.gitFactory.diffSummary.insertions,
-			// 			this.gitFactory.diffSummary.deletions,
-			// 		),
-			// 	);
-			// 	this.screen.screen.render();
-			// }, 1800);
 		});
 
 		this.statusFactory.clearAfterCommit();
-		// this.status.removeItemsReally(this.gitFactory.getFilesForCommit());
 		this.gitFactory.gitStatus.created.length = 0;
 		this.gitFactory.clearAfterCommmit();
 		this.diffFactory.element.setContent("");
