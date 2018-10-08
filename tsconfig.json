@@ -1,0 +1,19 @@
+{
+    "compilerOptions": {
+        "module": "commonjs",
+        "esModuleInterop": false,
+        "target": "es5",
+        "noImplicitAny": false,
+        "emitDecoratorMetadata": true,
+        "experimentalDecorators": true,
+        "moduleResolution": "node",
+        "sourceMap": false,
+        "outDir": "build",
+        "baseUrl": ".",
+        "noUnusedLocals": true,
+        "noUnusedParameters": true,
+        "lib": ["ES2015"]
+    },
+    "types": ["node", "blessed", "reflect-metadata"],
+    "include": ["src/*", "src/**/*"]
+}
