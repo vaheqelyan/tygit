@@ -2,7 +2,6 @@ import * as SimpleGitAsync from "simple-git";
 import * as git from "simple-git/promise";
 
 import { ExecException, execFile, spawn } from "child_process";
-import * as fuzzysearch from "fuzzysearch";
 
 class Git {
 	public dir: string;
@@ -33,22 +32,21 @@ class Git {
 		});
 	}
 
+	/* I know this is not the best implementation. will work later */
 	public prettyDiff(str: string) {
-		const splitLines: string[] = str.split("\n");
+		const splitLines = str.split("\n");
 		const key = [];
 
 		for (let i = 0; i < splitLines.length; i++) {
-			const line: string = splitLines[i];
+			const line = splitLines[i];
 			const firstLeter = line[0];
 			const secondLetter = line[1];
 
-			if (fuzzysearch("diff --git", line)) {
-				const val = line.split(" ")[2];
-
-				key.push(val.substr(2));
+			if (/diff --git/g.test(line)) {
+				key.push(line.split(" ")[2].substr(2));
 			}
 
-			if (fuzzysearch("diff --cc", line)) {
+			if (/diff --cc/g.test(line)) {
 				const val = line.split(" ")[2];
 				key.push(val);
 			}
@@ -64,12 +62,10 @@ class Git {
 				splitLines[i] = `{bold}{cyan-fg}${line}{/cyan-fg}{/bold}`;
 			}
 		}
-
 		const res = splitLines
 			.join("\n")
 			.split("diff")
 			.slice(1);
-
 		for (let i = 0; i < key.length; i++) {
 			this.diffs.set(key[i], res[i]);
 		}
