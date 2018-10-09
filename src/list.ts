@@ -102,6 +102,9 @@ export default abstract class List {
 			return selBranchName;
 		}
 	}
+	public getElement() {
+		return this.element;
+	}
 
 	public parseFileName(fileName: string) {
 		return fileName.split(" ")[3];
