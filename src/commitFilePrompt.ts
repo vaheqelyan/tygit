@@ -24,7 +24,7 @@ class CommitFileInput extends Prompt {
 	public msgFactory: Message;
 
 	public handle(fileName) {
-		this.statusBarFactory.setTitleAndRender("Ok::File has been commited.");
+		this.statusBarFactory.setTitleAndRender(MSG.COMMITED);
 		this.gitFactory.async.diffSummary((err: Error, res: any) => {
 			if (err) {
 				console.log(err);
@@ -32,7 +32,7 @@ class CommitFileInput extends Prompt {
 			this.gitFactory.diffSummary = res;
 			this.statusBarFactory.resetContent();
 		});
-		this.statusFactory.element.removeItem(this.statusFactory.getSelected());
+		this.statusFactory.getElement().removeItem(this.statusFactory.getSelected());
 		if (this.gitFactory.diffs.has(fileName)) {
 			this.diffFactory.element.setContent(" ");
 			this.gitFactory.diffs.delete(fileName);
@@ -61,8 +61,6 @@ class CommitFileInput extends Prompt {
 		});
 
 		this.statusFactory.clearAfterCommit();
-		this.gitFactory.gitStatus.created.length = 0;
-		this.gitFactory.clearAfterCommmit();
 		this.diffFactory.element.setContent("");
 		this.gitFactory.clearDiffs();
 
