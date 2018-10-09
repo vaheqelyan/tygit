@@ -60,7 +60,7 @@ class Git {
 		return lines.join("\n");
 	}
 
-	public startDiffing() {
+	public startDiffing(observerCallback: (fnam: string) => void) {
 		const keys = Array.from(this.diffs.keys());
 		if (keys.length > 0) {
 			lupus(0, keys.length, n => {
@@ -70,6 +70,7 @@ class Git {
 						console.log(err);
 					}
 					this.diffs.set(filePath, this.parseDiff(out));
+					observerCallback(filePath);
 				});
 			});
 		}
@@ -243,6 +244,10 @@ class Git {
 
 			handle();
 		});
+	}
+
+	public removeFromStatusMap(item) {
+		this.gitMapStatus.delete(item);
 	}
 }
 
