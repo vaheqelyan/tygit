@@ -41,6 +41,8 @@ class Branches extends List {
 
 		this.statusBarFactory.toogleContent(`Ok::Switched to branch '${branchName}'`);
 
+		this.enable()
+
 		this.screen.screen.render();
 	};
 	public switchBranchErrorHandle = err => {
@@ -60,6 +62,8 @@ class Branches extends List {
 			const branchName = selected.getText();
 			if (branchName.indexOf("*") !== 0) {
 				this.gitFactory.switchBranch(branchName, this.switchBranchHandle, this.switchBranchErrorHandle);
+
+				this.disable();
 			}
 		}
 	}
