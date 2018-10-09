@@ -48,15 +48,15 @@ class Status extends List {
 	}
 
 	public afterTrack() {
-		this.statusBarFactory.toogleContent(MSG.TRACKED)
+		this.statusBarFactory.toogleContent(MSG.TRACKED);
 		for (const [key] of this.gitFactory.gitMapStatus) {
 			const getValue = this.getElement().getItem(`?  ${key}`);
-			if(getValue) {
+			if (getValue) {
 				getValue.setContent(`{green-bg} {white-fg}{bold}A{/bold}{/white-fg} {/green-bg} ${key}`);
-				this.gitFactory.gitMapStatus.set(key,"A");
+				this.gitFactory.gitMapStatus.set(key, "A");
 			}
 		}
-		this.screenFactory.screen.render()
+		this.screenFactory.screen.render();
 	}
 
 	public trackFiles() {
