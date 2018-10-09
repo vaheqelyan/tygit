@@ -59,7 +59,7 @@ export default class Screen {
 
 		this.gitFactory.status(() => {
 			this.statusFactory.reload();
-			this.gitFactory.startDiffing();
+			this.gitFactory.startDiffing(this.diffFactory.observerForMap);
 		});
 
 		this.gitFactory.initDiffSummary(() => {
@@ -138,18 +138,13 @@ export default class Screen {
 	}
 	public handlePull = () => {
 		this.statusBarFactory.setTitleAndRender(MSG.PULLED);
-		this.gitFactory.initStatus(() => {
+		this.gitFactory.status(() => {
 			this.statusFactory.reload();
+			this.gitFactory.startDiffing(this.diffFactory.observerForMap);
+			this.statusBarFactory.toogleContent(MSG.RELOADED);
 			this.screen.render();
 		});
-		this.gitFactory.asyncDiff((err, data) => {
-			if (err) {
-				console.log(err);
-			}
-			this.gitFactory.prettyDiff(data);
-			this.diffFactory.diffOnFocus();
-			this.screen.render();
-		});
+
 		this.gitFactory.initDiffSummary(() => {
 			this.statusBarFactory.resetContent();
 		});
@@ -235,30 +230,21 @@ export default class Screen {
 		if (this.curElement === "Status") {
 			this.statusBarFactory.setTitleAndRender(MSG.RELOAD);
 			this.gitFactory.status(() => {
-				// console.log(this.gitFactory.gitMapStatus);
 				this.statusFactory.reload();
-				// console.log('done');
-				this.gitFactory.startDiffing();
-				// this.statusBarFactory.resetContent(false)
+				this.gitFactory.startDiffing(this.diffFactory.observerForMap);
 				this.statusBarFactory.toogleContent(MSG.RELOADED);
 				this.screen.render();
 			});
 		} else {
-			this.statusBarFactory.setTitleAndRender("global");
+			this.statusBarFactory.setTitleAndRender(MSG.RELOAD);
 			this.gitFactory.initBranches(() => {
 				this.branchFactory.reload();
 				this.screen.render();
 			});
-			this.gitFactory.initStatus(() => {
+			this.gitFactory.status(() => {
 				this.statusFactory.reload();
-				this.screen.render();
-			});
-			this.gitFactory.asyncDiff((err, data) => {
-				if (err) {
-					console.log(err);
-				}
-				this.gitFactory.prettyDiff(data);
-				this.diffFactory.diffOnFocus();
+				this.gitFactory.startDiffing(this.diffFactory.observerForMap);
+				this.statusBarFactory.toogleContent(MSG.RELOADED);
 				this.screen.render();
 			});
 			this.gitFactory.initDiffSummary(() => {
