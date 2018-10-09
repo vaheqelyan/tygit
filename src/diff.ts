@@ -17,9 +17,14 @@ class Diff {
 	public diffOnFocus() {
 		const selected = this.statusFactory.getSelected();
 		if (selected) {
-			const getFileName = this.statusFactory.getSelectedFileName();
+			const getFileName = this.statusFactory.parseFileName(selected.getText());
 			if (this.gitFactory.diffs.has(getFileName)) {
-				this.element.setContent(this.gitFactory.diffs.get(getFileName));
+				const diff = this.gitFactory.diffs.get(getFileName);
+				if (diff.length > 0) {
+					this.element.setContent(diff);
+				} else {
+					this.element.setContent("wait diffing ....");
+				}
 			}
 		}
 	}
