@@ -12,7 +12,7 @@ class BranchPrompt extends Prompt {
 	public screenFactory: Screen;
 
 	public handle = () => {
-		this.screenFactory.reload(true);
+		this.screenFactory.reload();
 	};
 	public handleError = err => {
 		this.screenFactory.alertError(err);
