@@ -1,3 +1,4 @@
+import * as blessed from "blessed";
 import { Inject } from "typedi";
 import Branches from "./branch";
 import Git from "./git";
@@ -20,9 +21,12 @@ export default class DeleteBranchPrompt extends Prompt {
 	};
 	public deleteBranchHandle(branchName) {
 		this.screenFactory.screen.remove(this.element);
-		for (let i = 0; i < this.branchFactory.element.items.length; i++) {
-			if (this.branchFactory.element.getItem(this.branchFactory.element.items[i]).getText() === branchName) {
-				this.branchFactory.element.removeItem(this.branchFactory.element.getItem(this.branchFactory.element.items[i]));
+		const { items } = this.branchFactory.getElement();
+		for (let i = 0; i < items.length; i++) {
+			const elitem: blessed.Widgets.ListElement = this.branchFactory.getElement().getItem(items[i]);
+			const elitemText = elitem.getText();
+			if (elitemText === branchName) {
+				this.branchFactory.getElement().removeItem(elitem);
 			}
 		}
 		this.statusBarFactory.toogleContent(`Ok:: Deleted branch ${branchName}`);
