@@ -84,6 +84,21 @@ class Diff {
 		this.element = this.createElement();
 		this.screenFactory.screen.append(this.element);
 	}
+	public observerForMap = path => {
+		const selected = this.statusFactory.getSelected();
+		if (selected) {
+			const getPath = this.statusFactory.parseFileName(selected.getText());
+			if (getPath === path) {
+				if (this.gitFactory.diffs.has(getPath)) {
+					const getDiffResult = this.gitFactory.diffs.get(getPath);
+					if (getDiffResult.length > 0) {
+						this.element.setContent(getDiffResult);
+						this.screenFactory.screen.render();
+					}
+				}
+			}
+		}
+	};
 }
 
 export default Diff;
