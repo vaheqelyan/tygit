@@ -51,7 +51,7 @@ export default abstract class List {
 		});
 		this.element.on("keypress", this.onSelect.bind(this));
 	}
-	public onSelect(ch: string, key: blessed.Widgets.Events.IKeyEventArg) {
+	public onSelect = (ch: string, key: blessed.Widgets.Events.IKeyEventArg) => {
 		if (key.name === "up" || key.name === "k") {
 			this.element.up();
 
@@ -74,7 +74,7 @@ export default abstract class List {
 				this.onEnter();
 			}
 		}
-	}
+	};
 	public focus() {
 		this.element.focus();
 	}
@@ -111,6 +111,12 @@ export default abstract class List {
 	}
 	public parseFileStatusType(fileName: string) {
 		return fileName.split(" ")[1];
+	}
+	public enable() {
+		this.element.addListener("keypress", this.onSelect);
+	}
+	public disable() {
+		this.element.removeListener("keypress", this.onSelect);
 	}
 	protected onUp?(): void;
 	protected onDown?(): void;
