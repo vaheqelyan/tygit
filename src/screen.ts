@@ -56,18 +56,12 @@ export default class Screen {
 		this.gitFactory.initBranches(() => {
 			this.branchFactory.reload();
 		});
-		this.gitFactory.initStatus(() => {
+
+		this.gitFactory.status(() => {
 			this.statusFactory.reload();
+			this.gitFactory.startDiffing();
 		});
 
-		this.gitFactory.asyncDiff((err, data) => {
-			if (err) {
-				console.log(err);
-			}
-			this.gitFactory.prettyDiff(data);
-
-			this.diffFactory.reload();
-		});
 		this.gitFactory.initDiffSummary(() => {
 			this.statusBarFactory.loaded();
 		});
@@ -237,24 +231,20 @@ export default class Screen {
 		this.gitFactory.pullNoArgs(this.handlePull, this.handlePullError);
 	}
 
-	public reload = (all?: boolean) => {
-		if (this.curElement === "Status" && all === undefined) {
-			this.statusBarFactory.setTitleAndRender(MSG.RELOAD_STATUS);
-			this.gitFactory.initStatus(() => {
+	public reload = () => {
+		if (this.curElement === "Status") {
+			this.statusBarFactory.setTitleAndRender(MSG.RELOAD);
+			this.gitFactory.status(() => {
+				// console.log(this.gitFactory.gitMapStatus);
 				this.statusFactory.reload();
-				this.screen.render();
-			});
-			this.gitFactory.asyncDiff((err, data) => {
-				if (err) {
-					console.log(err);
-				}
-				this.gitFactory.prettyDiff(data);
-				this.diffFactory.diffOnFocus();
-				this.statusBarFactory.toogleContent(MSG.STATUS_RELOADED);
+				// console.log('done');
+				this.gitFactory.startDiffing();
+				// this.statusBarFactory.resetContent(false)
+				this.statusBarFactory.toogleContent(MSG.RELOADED);
 				this.screen.render();
 			});
 		} else {
-			this.statusBarFactory.setTitleAndRender(MSG.RELOAD);
+			this.statusBarFactory.setTitleAndRender("global");
 			this.gitFactory.initBranches(() => {
 				this.branchFactory.reload();
 				this.screen.render();
