@@ -36,6 +36,7 @@
   "dependencies": {
     "blessed": "^0.1.81",
     "fuzzysearch": "^1.0.3",
+    "lupus": "0.0.1",
     "minimist": "^1.2.0",
     "reflect-metadata": "^0.1.12",
     "simple-git": "^1.102.0",
