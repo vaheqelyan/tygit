@@ -37,6 +37,7 @@ class CommitFileInput extends Prompt {
 			this.diffFactory.element.setContent(" ");
 			this.gitFactory.diffs.delete(fileName);
 		}
+		this.gitFactory.removeFromStatusMap(fileName);
 		this.screen.screen.render();
 	}
 	public handleError = err => {
@@ -63,6 +64,7 @@ class CommitFileInput extends Prompt {
 		this.statusFactory.clearAfterCommit();
 		this.diffFactory.element.setContent("");
 		this.gitFactory.clearDiffs();
+		this.gitFactory.clearAfterCommmit();
 
 		this.screen.screen.render();
 	};
