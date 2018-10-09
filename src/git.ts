@@ -3,6 +3,8 @@ import * as git from "simple-git/promise";
 
 import { ExecException, execFile, spawn } from "child_process";
 
+import * as lupus from "lupus";
+
 class Git {
 	public dir: string;
 	public gitStatus: git.StatusResult;
@@ -11,6 +13,7 @@ class Git {
 	public g: git.SimpleGit;
 	public diffSummary: git.DiffResult = null;
 	public diffs: Map<string, string> = new Map();
+	public gitMapStatus: Map<string, string> = new Map();
 	public remoteList: any;
 	public ex: any;
 	constructor(container) {
@@ -32,47 +35,44 @@ class Git {
 		});
 	}
 
-	/* I know this is not the best implementation. will work later */
-	public prettyDiff(str: string) {
-		const splitLines = str.split("\n");
-		const key = [];
-
-		for (let i = 0; i < splitLines.length; i++) {
-			const line = splitLines[i];
-			const firstLeter = line[0];
-			const secondLetter = line[1];
-
-			if (/diff --git/g.test(line)) {
-				key.push(line.split(" ")[2].substr(2));
-			}
-
-			if (/diff --cc/g.test(line)) {
-				const val = line.split(" ")[2];
-				key.push(val);
-			}
-
-			if (firstLeter === "-" || secondLetter === "-") {
-				splitLines[i] = `{bold}{red-fg}${line}{/red-fg}{/bold}`;
-			}
-
-			if (firstLeter === "+" || secondLetter === "+") {
-				splitLines[i] = `{bold}{green-fg}${line}{/green-fg}{/bold}`;
-			}
-			if (firstLeter === "@" || secondLetter === "@") {
-				splitLines[i] = `{bold}{cyan-fg}${line}{/cyan-fg}{/bold}`;
-			}
-		}
-		const res = splitLines
-			.join("\n")
-			.split("diff")
-			.slice(1);
-		for (let i = 0; i < key.length; i++) {
-			this.diffs.set(key[i], res[i]);
-		}
-	}
-
 	public isNeedDiff(): boolean {
 		return this.gitStatus.modified.length > 0 || this.gitStatus.conflicted.length > 0;
+	}
+
+	public parseDiff(diff: string) {
+		const lines = diff.split("\n");
+		lines.forEach((value, index) => {
+			const [firstLetter] = value;
+
+			switch (firstLetter) {
+				case "+":
+					lines[index] = `{bold}{green-fg}${value}{/green-fg}{/bold}`;
+					break;
+
+				case "-":
+					lines[index] = `{bold}{red-fg}${value}{/red-fg}{/bold}`;
+					break;
+				case "@":
+					lines[index] = `{bold}{cyan-fg}${value}{/cyan-fg}{/bold}`;
+					break;
+			}
+		});
+		return lines.join("\n");
+	}
+
+	public startDiffing() {
+		const keys = Array.from(this.diffs.keys());
+		if (keys.length > 0) {
+			lupus(0, keys.length, n => {
+				const filePath = keys[n];
+				this.runCmd(["diff", "HEAD", filePath], (err, out) => {
+					if (err) {
+						console.log(err);
+					}
+					this.diffs.set(filePath, this.parseDiff(out));
+				});
+			});
+		}
 	}
 
 	public initStatus(cb) {
@@ -106,11 +106,7 @@ class Git {
 	}
 
 	public clearAfterCommmit() {
-		this.gitStatus.modified.length = 0;
-		this.gitStatus.created.length = 0;
-		this.gitStatus.deleted.length = 0;
-		this.gitStatus.conflicted.length = 0;
-		this.gitStatus.renamed.length = 0;
+		this.gitMapStatus.clear();
 	}
 
 	public track(cb: (err: Error, data: any) => void) {
@@ -181,6 +177,35 @@ class Git {
 	}
 	public asyncDiff(cb) {
 		this.async.diff(cb);
+	}
+	public parseStatus(str: string) {
+		const toLines = str.split("\n");
+		toLines.pop();
+		for (const line of toLines) {
+			const s = line.split(" ").filter(empty => empty);
+			const flag = s[0];
+			const path = s[1];
+
+			if (flag === "M") {
+				this.diffs.set(path, "");
+			}
+
+			this.gitMapStatus.set(path, flag);
+		}
+	}
+
+	public status(cb: () => void) {
+		this.runCmd(["status", "--short"], (err, out) => {
+			if (err) {
+				console.log(err);
+			}
+			if (out.length > 0) {
+				this.parseStatus(out);
+				cb();
+			} else {
+				cb();
+			}
+		});
 	}
 
 	public merge(branchName, handle: () => void, handleError: (err: string) => void) {
