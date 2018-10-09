@@ -11,7 +11,7 @@ import StatusBar from "./statusBar";
 @Service()
 class Status extends List {
 	@Inject(() => Screen)
-	public screen: Screen;
+	public screenFactory: Screen;
 	@Inject(() => Git)
 	public gitFactory: Git;
 
@@ -27,12 +27,12 @@ class Status extends List {
 	public onUp() {
 		this.setStatusBarSelectedTitle();
 		this.diffFactory.diffOnFocus();
-		this.screen.screen.render();
+		this.screenFactory.screen.render();
 	}
 	public onDown() {
 		this.setStatusBarSelectedTitle();
 		this.diffFactory.diffOnFocus();
-		this.screen.screen.render();
+		this.screenFactory.screen.render();
 	}
 
 	public onEnter() {
@@ -43,26 +43,20 @@ class Status extends List {
 	}
 
 	public reload() {
-		this.element.setItems(buildStatusArray(this.gitFactory.gitStatus));
+		this.element.setItems(buildStatusArray(this.gitFactory.gitMapStatus));
 		this.element.select(0);
 	}
 
 	public afterTrack() {
-		const { not_added } = this.gitFactory.gitStatus;
-
-		this.statusBarFactory.toogleContent(MSG.TRACKED);
-
-		for (const value of not_added) {
-			const getValue = this.element.getItem(`?  ${value}`);
-			if (getValue) {
-				getValue.setContent(`{green-bg} {white-fg}{bold}A{/bold}{/white-fg} {/green-bg} ${value}`);
+		this.statusBarFactory.toogleContent(MSG.TRACKED)
+		for (const [key] of this.gitFactory.gitMapStatus) {
+			const getValue = this.getElement().getItem(`?  ${key}`);
+			if(getValue) {
+				getValue.setContent(`{green-bg} {white-fg}{bold}A{/bold}{/white-fg} {/green-bg} ${key}`);
+				this.gitFactory.gitMapStatus.set(key,"A");
 			}
 		}
-
-		const computeCreated = not_added.concat(this.gitFactory.gitStatus.created);
-		this.gitFactory.gitStatus.created = computeCreated;
-
-		this.screen.screen.render();
+		this.screenFactory.screen.render()
 	}
 
 	public trackFiles() {
