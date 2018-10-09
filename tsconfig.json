@@ -12,6 +12,7 @@
         "baseUrl": ".",
         "noUnusedLocals": true,
         "noUnusedParameters": true,
+        "downlevelIteration":true,
         "lib": ["ES2015"]
     },
     "types": ["node", "blessed", "reflect-metadata"],
