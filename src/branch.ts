@@ -41,7 +41,7 @@ class Branches extends List {
 
 		this.statusBarFactory.toogleContent(`Ok::Switched to branch '${branchName}'`);
 
-		this.enable()
+		this.enable();
 
 		this.screen.screen.render();
 	};
