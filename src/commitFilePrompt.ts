@@ -21,7 +21,7 @@ class CommitFileInput extends Prompt {
 	public diffFactory: Diff;
 
 	public handle(fileName) {
-		this.statusBarFactory.setTitleAndRender(MSG.COMMITED)
+		this.statusBarFactory.setTitleAndRender(MSG.COMMITED);
 		this.gitFactory.async.diffSummary((err: Error, res: any) => {
 			if (err) {
 				console.log(err);
@@ -43,6 +43,7 @@ class CommitFileInput extends Prompt {
 	};
 
 	public handleCommitAll = () => {
+		this.statusBarFactory.setTitleAndRender(MSG.COMMITED)
 		this.gitFactory.async.diffSummary((err: Error, res: any) => {
 			if (err) {
 				console.log(err);
@@ -56,7 +57,7 @@ class CommitFileInput extends Prompt {
 		this.gitFactory.clearDiffs();
 		this.gitFactory.clearAfterCommmit();
 
-		this.screen.screen.render();
+		this.screenFactory.screen.render();
 	};
 
 	public onSubmit(value) {
@@ -67,7 +68,7 @@ class CommitFileInput extends Prompt {
 			this.gitFactory.commit(value, this.handleCommitAll, this.handleError);
 		}
 
-		this.statusBarFactory.toogleContent(MSG.COMMITING);
+		this.statusBarFactory.setTitleAndRender(MSG.COMMITING, false);
 
 		this.screen.screen.remove(this.element);
 		this.screen.screen.render();
