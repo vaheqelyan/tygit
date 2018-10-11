@@ -12,7 +12,7 @@ class StatusBar {
 	public gitFactory: Git;
 
 	@Inject(() => Screen)
-	public screen: Screen;
+	public screenFactory: Screen;
 
 	public getElement() {
 		return this.element;
@@ -22,8 +22,8 @@ class StatusBar {
 	}
 	public appendAndRender() {
 		this.element = this.createElement();
-		this.screen.screen.append(this.element);
-		this.screen.screen.render();
+		this.screenFactory.screen.append(this.element);
+		this.screenFactory.screen.render();
 	}
 	public toogleContent(val1: string, val2: string = "", ms: number = 1800) {
 		this.element.setContent(
@@ -34,7 +34,7 @@ class StatusBar {
 				val1,
 			),
 		);
-		this.screen.screen.render();
+		this.screenFactory.screen.render();
 
 		setTimeout(() => {
 			this.element.setContent(
@@ -45,7 +45,7 @@ class StatusBar {
 					val2,
 				),
 			);
-			this.screen.screen.render();
+			this.screenFactory.screen.render();
 		}, ms);
 	}
 
@@ -58,7 +58,7 @@ class StatusBar {
 			),
 		);
 		if (r) {
-			this.screen.screen.render();
+			this.screenFactory.screen.render();
 		}
 	}
 
@@ -72,7 +72,7 @@ class StatusBar {
 			),
 		);
 		if (ren) {
-			this.screen.screen.render();
+			this.screenFactory.screen.render();
 		}
 	}
 
@@ -126,7 +126,7 @@ class StatusBar {
 
 	public appendToScreen() {
 		this.element = this.createElement();
-		this.screen.screen.append(this.element);
+		this.screenFactory.screen.append(this.element);
 	}
 	public loaded() {
 		this.toogleContent(MSG.LOADED);
