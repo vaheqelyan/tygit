@@ -4,9 +4,9 @@ import Screen from "./screen";
 
 @Service()
 export default abstract class List {
-	protected element: blessed.Widgets.ListbarElement = null;
+	protected element: blessed.Widgets.ListElement = null;
 	@Inject(() => Screen)
-	private screenFactory: Screen;
+	public screenFactory: Screen;
 
 	public appendToScreen(label, items, width, height, top?: string) {
 		this.makeElement(label, items, width, height, top);
@@ -102,7 +102,7 @@ export default abstract class List {
 			return selBranchName;
 		}
 	}
-	public getElement() {
+	public getElement(): blessed.Widgets.ListElement {
 		return this.element;
 	}
 
