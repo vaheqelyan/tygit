@@ -195,7 +195,7 @@ export default class Screen {
 		}, 500);
 		this.PPress = n;
 	};
-	public alertError(err){
+	public alertError(err) {
 		this.statusBarFactory.resetContent();
 		this.msgFactory.display(err, (msgErr, value) => {
 			if (msgErr) {
