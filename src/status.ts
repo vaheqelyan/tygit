@@ -6,12 +6,9 @@ import Diff from "./diff";
 import buildStatusArray from "./fn/buildStatusArray";
 import Git from "./git";
 import MSG from "./messages/statusBar";
-import Screen from "./screen";
 import StatusBar from "./statusBar";
 @Service()
 class Status extends List {
-	@Inject(() => Screen)
-	public screenFactory: Screen;
 	@Inject(() => Git)
 	public gitFactory: Git;
 
@@ -42,9 +39,11 @@ class Status extends List {
 		}
 	}
 
-	public reload() {
+	public reload(selectZeroItem:boolean=true) {
 		this.element.setItems(buildStatusArray(this.gitFactory.gitMapStatus));
-		this.element.select(0);
+		if(selectZeroItem) {
+			this.element.select(0);
+		}
 	}
 
 	public afterTrack() {
@@ -84,6 +83,13 @@ class Status extends List {
 				const fileName = sel.getText();
 				this.statusBarFactory.setFileTitle(this.parseFileName(fileName), this.parseFileStatusType(fileName), false);
 			}
+		}
+	}
+
+	public selectingNext() {
+		const select = this.getSelected();
+		if (select) {
+			this.diffFactory.diffOnFocus();
 		}
 	}
 }
