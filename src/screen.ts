@@ -81,6 +81,7 @@ export default class Screen {
 				shape: "line",
 			},
 			debug: true,
+			fastCSR: true,
 			dockBorders: true,
 			resizeTimeout: 300,
 			title: "widget test",
