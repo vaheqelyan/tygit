@@ -19,13 +19,13 @@ if (gitPath) {
 					sc.initStateAndRender();
 					// sc.haha()
 				} else {
-					console.log("It is not a git repository.");
+					console.log("This is not a git repository");
 				}
 			});
 		} else {
-			console.log("Path is not correct.");
+			console.log("The path is not correct");
 		}
 	});
 } else {
-	console.log("Please select the path of the git repository");
+	console.log("Please, choose git repository path");
 }
