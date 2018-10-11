@@ -195,15 +195,15 @@ export default class Screen {
 		}, 500);
 		this.PPress = n;
 	};
-	public alertError(err) {
+	public alertError(err){
+		this.statusBarFactory.resetContent();
 		this.msgFactory.display(err, (msgErr, value) => {
 			if (msgErr) {
 				console.log(msgErr);
 			}
 			if (value) {
-				this.statusBarFactory.resetContent();
-				this.screen.screen.remove(this.msgFactory.element);
-				this.screen.screen.render();
+				this.screen.remove(this.msgFactory.element);
+				this.screen.render();
 			}
 		});
 	}
@@ -230,7 +230,7 @@ export default class Screen {
 		if (this.curElement === "Status") {
 			this.statusBarFactory.setTitleAndRender(MSG.RELOAD);
 			this.gitFactory.status(() => {
-				this.statusFactory.reload();
+				this.statusFactory.reload(false);
 				this.gitFactory.startDiffing(this.diffFactory.observerForMap);
 				this.statusBarFactory.toogleContent(MSG.RELOADED);
 				this.screen.render();
