@@ -1,7 +1,6 @@
 import { Inject } from "typedi";
 import Diff from "./diff";
 import Git from "./git";
-import Message from "./message";
 import Prompt from "./prompt";
 import Screen from "./screen";
 import Status from "./status";
@@ -20,8 +19,6 @@ class CommitFileInput extends Prompt {
 	public statusBarFactory: StatusBar;
 	@Inject(() => Diff)
 	public diffFactory: Diff;
-	@Inject(() => Message)
-	public msgFactory: Message;
 
 	public handle(fileName) {
 		this.statusBarFactory.setTitleAndRender(MSG.COMMITED);
@@ -38,18 +35,11 @@ class CommitFileInput extends Prompt {
 			this.gitFactory.diffs.delete(fileName);
 		}
 		this.gitFactory.removeFromStatusMap(fileName);
+		this.statusFactory.selectingNext();
 		this.screen.screen.render();
 	}
 	public handleError = err => {
-		this.msgFactory.display(err, (errMsg, value) => {
-			if (errMsg) {
-				console.log(errMsg);
-			}
-			if (value) {
-				this.screen.screen.remove(this.msgFactory.element);
-				this.screen.screen.render();
-			}
-		});
+		this.screenFactory.alertError(err);
 	};
 
 	public handleCommitAll = () => {
