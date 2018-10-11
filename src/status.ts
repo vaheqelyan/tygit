@@ -39,9 +39,9 @@ class Status extends List {
 		}
 	}
 
-	public reload(selectZeroItem:boolean=true) {
+	public reload(selectZeroItem: boolean = true) {
 		this.element.setItems(buildStatusArray(this.gitFactory.gitMapStatus));
-		if(selectZeroItem) {
+		if (selectZeroItem) {
 			this.element.select(0);
 		}
 	}
