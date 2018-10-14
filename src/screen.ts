@@ -46,6 +46,7 @@ export default class Screen {
 	public msgFactory: Message;
 
 	public curElement: string | "Status" | "Diff" | "Branches";
+	private pullDataRes: string = null;
 
 	public initStateAndRender() {
 		this.branchFactory.appendToScreen("Branches", [], "30%", "20%");
@@ -137,30 +138,14 @@ export default class Screen {
 			return process.exit(0);
 		}
 	}
-	public handlePull = () => {
-		this.statusBarFactory.setTitleAndRender(MSG.PULLED);
-		this.gitFactory.status(() => {
-			this.statusFactory.reload();
-			this.gitFactory.startDiffing(this.diffFactory.observerForMap);
-			this.statusBarFactory.toogleContent(MSG.RELOADED);
-			this.screen.render();
-		});
+	public handlePullClose = () => {
+		if (fuzzysearch("CONFLICT", this.pullDataRes)) {
+			this.statusBarFactory.toogleContent(MSG.PULLED_WITH_CONFLICT);
+		} else {
+			this.statusBarFactory.toogleContent(MSG.PULLED);
+		}
 
-		this.gitFactory.initDiffSummary(() => {
-			this.statusBarFactory.resetContent();
-		});
-	};
-	public handlePullError = err => {
-		this.msgFactory.display(err, (msgErr, value) => {
-			if (msgErr) {
-				console.log(msgErr);
-			}
-			if (value) {
-				this.statusBarFactory.resetContent();
-				this.screen.screen.remove(this.msgFactory.element);
-				this.screen.screen.render();
-			}
-		});
+		this.reload(true);
 	};
 	public ctrlPKey = () => {
 		const n = new Date();
@@ -224,16 +209,20 @@ export default class Screen {
 	}
 	public pull() {
 		this.statusBarFactory.setTitleAndRender(MSG.PULLING);
-		this.gitFactory.pullNoArgs(this.handlePull, this.handlePullError);
+		this.gitFactory.pullNoArgs(this.handlePull, this.handlePullClose);
 	}
 
-	public reload = () => {
-		if (this.curElement === "Status") {
-			this.statusBarFactory.setTitleAndRender(MSG.RELOAD);
+	public reload = (forceStatus: boolean = false) => {
+		if (this.curElement === "Status" || forceStatus) {
+			if (!forceStatus) {
+				this.statusBarFactory.setTitleAndRender(MSG.RELOAD);
+			}
 			this.gitFactory.status(() => {
 				this.statusFactory.reload(false);
 				this.gitFactory.startDiffing(this.diffFactory.observerForMap);
-				this.statusBarFactory.toogleContent(MSG.RELOADED);
+				if (!forceStatus) {
+					this.statusBarFactory.toogleContent(MSG.RELOADED);
+				}
 				this.screen.render();
 			});
 		} else {
@@ -257,5 +246,8 @@ export default class Screen {
 
 	public merge = () => {
 		this.mergePrompt.prompt("Merging with branch", "MERGE");
+	};
+	private handlePull = (data: Buffer) => {
+		this.pullDataRes = data.toString("utf8");
 	};
 }
