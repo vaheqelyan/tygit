@@ -145,7 +145,7 @@ export default class Screen {
 			this.statusBarFactory.toogleContent(MSG.PULLED);
 		}
 
-		this.reload(true);
+		this.reload(true,false);
 	};
 	public ctrlPKey = () => {
 		const n = new Date();
