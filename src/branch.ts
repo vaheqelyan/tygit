@@ -1,3 +1,4 @@
+import * as blessed from "blessed";
 import { Inject, Service } from "typedi";
 import BranchPrompt from "./BranchPrompt";
 import DeleteBranchPrompt from "./DeleteBranchPrompt";
@@ -70,7 +71,7 @@ class Branches extends List {
 
 	public reload() {
 		let val = null;
-		const uiBranchComputed: string[] = this.gitFactory.branches.all.map((value: string, index: number) => {
+		const uiBranchComputed: string[] = this.gitFactory.branches.all.map((value: string) => {
 			if (this.gitFactory.branches.current === value) {
 				val = value;
 			}
