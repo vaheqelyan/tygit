@@ -212,15 +212,15 @@ export default class Screen {
 		this.gitFactory.pullNoArgs(this.handlePull, this.handlePullClose);
 	}
 
-	public reload = (forceStatus: boolean = false) => {
+	public reload = (forceStatus: boolean = false, showTitle:boolean = true) => {
 		if (this.curElement === "Status" || forceStatus) {
-			if (!forceStatus) {
+			if (showTitle) {
 				this.statusBarFactory.setTitleAndRender(MSG.RELOAD);
 			}
 			this.gitFactory.status(() => {
 				this.statusFactory.reload(false);
 				this.gitFactory.startDiffing(this.diffFactory.observerForMap);
-				if (!forceStatus) {
+				if (showTitle) {
 					this.statusBarFactory.toogleContent(MSG.RELOADED);
 				}
 				this.screen.render();
