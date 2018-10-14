@@ -43,7 +43,7 @@ class CommitFileInput extends Prompt {
 	};
 
 	public handleCommitAll = () => {
-		this.statusBarFactory.setTitleAndRender(MSG.COMMITED)
+		this.statusBarFactory.setTitleAndRender(MSG.COMMITED);
 		this.gitFactory.async.diffSummary((err: Error, res: any) => {
 			if (err) {
 				console.log(err);
