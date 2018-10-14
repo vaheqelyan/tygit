@@ -15,6 +15,7 @@ const MSG = {
 	STATUS_RELOADED: "Ok::Status reloaded",
 	TRACKED: "Ok::File/s has been tracked",
 	TRACKING: "Wait::Tracking files",
+	PULLED_WITH_CONFLICT:'Ok::Pulled, you have conflicts'
 };
 
 export default MSG;
