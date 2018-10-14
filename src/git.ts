@@ -65,13 +65,24 @@ class Git {
 		if (keys.length > 0) {
 			lupus(0, keys.length, n => {
 				const filePath = keys[n];
-				this.runCmd(["diff", "HEAD", filePath], (err, out) => {
-					if (err) {
-						console.log(err);
-					}
-					this.diffs.set(filePath, this.parseDiff(out));
-					observerCallback(filePath);
-				});
+				const getFlag = this.gitMapStatus.get(filePath);
+				if (getFlag.length > 1) {
+					this.runCmd(["diff", "--no-color", filePath], (err, out) => {
+						if (err) {
+							console.log(err);
+						}
+						this.diffs.set(filePath, this.parseDiff(out));
+						observerCallback(filePath);
+					});
+				} else {
+					this.runCmd(["diff", "--no-color", "HEAD", filePath], (err, out) => {
+						if (err) {
+							console.log(err);
+						}
+						this.diffs.set(filePath, this.parseDiff(out));
+						observerCallback(filePath);
+					});
+				}
 			});
 		}
 	}
@@ -147,23 +158,15 @@ class Git {
 		});
 	}
 
-	public pullNoArgs(handleExec: () => void, handleExecError: (err: string) => void) {
-		this.runCmd(["pull"], err => {
-			if (err) {
-				handleExecError(err.message.toString());
-				return;
-			}
-			handleExec();
-		});
+	public pullNoArgs(handleExec: (data: Buffer) => void, onClose: (code: any) => void) {
+		const pull = spawn("git", ["pull"], { cwd: this.dir });
+		pull.stdout.on("data", handleExec);
+		pull.on("close", onClose);
 	}
-	public pull(value: string, handleExec: () => void, handleExecError: (err: string) => void) {
-		this.runCmd(["pull", ...value.split(" ")], err => {
-			if (err) {
-				handleExecError(err.message.toString());
-				return;
-			}
-			handleExec();
-		});
+	public pull(value: string, handleExec: (data: Buffer) => void, onClose: (code: any) => void) {
+		const pull = spawn("git", ["pull", ...value.split(" ")], { cwd: this.dir });
+		pull.stdout.on("data", handleExec);
+		pull.on("close", onClose);
 	}
 
 	public pushNoArgs(handleErr) {
@@ -184,10 +187,10 @@ class Git {
 		toLines.pop();
 		for (const line of toLines) {
 			const s = line.split(" ").filter(empty => empty);
-			const flag = s[0];
+			const flag: string = s[0];
 			const path = s[1];
 
-			if (flag === "M") {
+			if (flag !== "A" && flag !== "D" && flag !== "DD" && flag !== "??") {
 				this.diffs.set(path, "");
 			}
 
