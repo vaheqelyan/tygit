@@ -11,9 +11,9 @@ export default function buildStatusArray(status: Map<string, string>) {
 			case "D":
 				arr.push(`{red-bg} {white-fg}{bold}D{/bold}{/white-fg} {/red-bg} ${key}`);
 				break;
-			case "??":
-				arr.push(`{red-bg} {white-fg}{bold}?{/bold}{/white-fg} {/red-bg} ${key}`);
-				break;
+		}
+		if (value.length > 1) {
+			arr.push(`{red-bg} {white-fg}{bold}${value}{/bold}{/white-fg} {/red-bg} ${key}`);
 		}
 	}
 	return arr;
