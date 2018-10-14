@@ -4,9 +4,9 @@ import Screen from "./screen";
 
 @Service()
 export default abstract class List {
-	protected element: blessed.Widgets.ListElement = null;
 	@Inject(() => Screen)
 	public screenFactory: Screen;
+	protected element: blessed.Widgets.ListElement = null;
 
 	public appendToScreen(label, items, width, height, top?: string) {
 		this.makeElement(label, items, width, height, top);
@@ -51,6 +51,7 @@ export default abstract class List {
 		});
 		this.element.on("keypress", this.onSelect.bind(this));
 	}
+
 	public onSelect = (ch: string, key: blessed.Widgets.Events.IKeyEventArg) => {
 		if (key.name === "up" || key.name === "k") {
 			this.element.up();
