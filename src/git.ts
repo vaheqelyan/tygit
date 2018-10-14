@@ -15,7 +15,6 @@ class Git {
 	public diffs: Map<string, string> = new Map();
 	public gitMapStatus: Map<string, string> = new Map();
 	public remoteList: any;
-	public ex: any;
 	constructor(container) {
 		this.dir = container.get("git-path");
 		this.g = git(this.dir);
