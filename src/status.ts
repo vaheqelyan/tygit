@@ -49,7 +49,7 @@ class Status extends List {
 	public afterTrack() {
 		this.statusBarFactory.toogleContent(MSG.TRACKED);
 		for (const [key] of this.gitFactory.gitMapStatus) {
-			const getValue = this.getElement().getItem(`?  ${key}`);
+			const getValue = this.getElement().getItem(`??  ${key}`);
 			if (getValue) {
 				getValue.setContent(`{green-bg} {white-fg}{bold}A{/bold}{/white-fg} {/green-bg} ${key}`);
 				this.gitFactory.gitMapStatus.set(key, "A");
@@ -63,7 +63,13 @@ class Status extends List {
 			if (err) {
 				console.log(err);
 			}
-			this.afterTrack();
+
+			/*
+				I'll process more complex solution 
+				Cleaning after without calling git status --short after each file staging
+				It is a little safe :) WIP
+			*/
+			this.screenFactory.reload(true);
 		});
 		this.statusBarFactory.setTitleAndRender(MSG.TRACKING);
 	}
