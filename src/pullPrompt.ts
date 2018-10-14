@@ -1,3 +1,4 @@
+import * as fuzzysearch from "fuzzysearch";
 import { Inject } from "typedi";
 import Diff from "./diff";
 import Git from "./git";
@@ -14,7 +15,7 @@ class PullInput extends Prompt {
 	@Inject(() => Status)
 	public statusFactory: Status;
 	@Inject(() => Screen)
-	public screen: Screen;
+	public screenFactory: Screen;
 	@Inject(() => StatusBar)
 	public statusBarFactory: StatusBar;
 	@Inject(() => Diff)
@@ -22,40 +23,27 @@ class PullInput extends Prompt {
 	@Inject(() => Message)
 	public msgFactory: Message;
 
-	public handlePull = () => {
-		this.statusBarFactory.setTitleAndRender(MSG.PULLED);
-		this.gitFactory.initDiffSummary(() => {
-			this.statusBarFactory.resetContent();
-		});
+	private dataRes: string;
 
-		this.gitFactory.initStatus(async () => {
-			this.statusFactory.reload();
-			this.screen.screen.render();
-			if (this.gitFactory.isNeedDiff()) {
-				this.gitFactory.prettyDiff(await this.gitFactory.g.diff());
-				this.diffFactory.diffOnFocus();
-				this.screen.screen.render();
-			}
-		});
-	};
-	public handlePullError = err => {
-		this.screen.msgFactory.display(err, (msgErr, value) => {
-			if (msgErr) {
-				console.log(msgErr);
-			}
-			if (value) {
-				this.statusBarFactory.resetContent();
-				this.screen.screen.remove(this.msgFactory.element);
-				this.screen.screen.render();
-			}
-		});
+	public handlePull = (data: Buffer) => {
+		this.dataRes = data.toString("utf8");
 	};
 
 	public onSubmit(value) {
-		this.gitFactory.pull(value, this.handlePull, this.handlePullError);
+		this.gitFactory.pull(value, this.handlePull, this.onClose);
 		this.statusBarFactory.setTitleAndRender(MSG.PULLING, false);
 		this.screen.screen.remove(this.element);
 		this.screen.screen.render();
 	}
+
+	private onClose = () => {
+		if (fuzzysearch("CONFLICT", this.dataRes)) {
+			this.statusBarFactory.toogleContent(MSG.PULLED_WITH_CONFLICT);
+		} else {
+			this.statusBarFactory.toogleContent(MSG.PULLED);
+		}
+
+		this.screenFactory.reload(true);
+	};
 }
 export default PullInput;
