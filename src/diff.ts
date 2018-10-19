@@ -4,6 +4,8 @@ import Git from "./git";
 import Screen from "./screen";
 import Status from "./status";
 
+import { setColumnForDiff, setDiffRowPosition, setRowForDiff } from "./fn/layout";
+
 @Service()
 class Diff {
 	public element: blessed.Widgets.BoxElement;
@@ -43,16 +45,17 @@ class Diff {
 		}
 	}
 	public createElement() {
+		const { width, height } = this.screenFactory.getTerminalSize();
 		const el = blessed.box({
 			alwaysScroll: true,
 			border: {
 				type: "line",
 			},
 			content: ``,
-			height: "95%",
+			height: setColumnForDiff(height),
 			keys: true,
 			label: "Diff",
-			left: "30%",
+			left: setDiffRowPosition(width),
 			mouse: true,
 			right: 0,
 			scrollable: true,
@@ -70,8 +73,7 @@ class Diff {
 				},
 			},
 			tags: true,
-			top: 0,
-			width: "69%",
+			width: setRowForDiff(width),
 		});
 
 		return el;
