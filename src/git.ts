@@ -189,7 +189,7 @@ class Git {
 			const flag: string = s[0];
 			const path = s[1];
 
-			if (flag !== "A" && flag !== "D" && flag !== "DD" && flag !== "??") {
+			if (flag !== "A" && flag !== "D" && flag !== "DD" && flag !== "??" && flag !== "AD") {
 				this.diffs.set(path, "");
 			}
 
