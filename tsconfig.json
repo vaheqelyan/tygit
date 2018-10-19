@@ -13,7 +13,11 @@
         "noUnusedLocals": true,
         "noUnusedParameters": true,
         "downlevelIteration":true,
-        "lib": ["ES2015"]
+        "importHelpers":true,
+        "lib": ["ES2015", 
+            "es2015.collection",
+            "es2015.iterable"],
+        "alwaysStrict":false
     },
     "types": ["node", "blessed", "reflect-metadata"],
     "include": ["src/*", "src/**/*"]
