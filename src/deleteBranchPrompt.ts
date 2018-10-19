@@ -1,4 +1,3 @@
-import * as blessed from "blessed";
 import { Inject } from "typedi";
 import Branches from "./branch";
 import Git from "./git";
@@ -21,9 +20,10 @@ export default class DeleteBranchPrompt extends Prompt {
 	};
 	public deleteBranchHandle(branchName) {
 		this.screenFactory.screen.remove(this.element);
+		// @ts-ignore
 		const { items } = this.branchFactory.getElement();
 		for (let i = 0; i < items.length; i++) {
-			const elitem: blessed.Widgets.ListElement = this.branchFactory.getElement().getItem(items[i]);
+			const elitem = this.branchFactory.getElement().getItem(items[i]);
 			const elitemText = elitem.getText();
 			if (elitemText === branchName) {
 				this.branchFactory.getElement().removeItem(elitem);
