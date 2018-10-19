@@ -9,10 +9,10 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "pretty": "prettier --config .prettierrc --write \"src/fn/*.ts\" \"src/*.ts\" ",
-    "lint": "tslint -c tslint.json 'src/**/*.ts'",
-    "fix-lint": "tslint --fix -c tslint.json 'src/**/*.ts'",
+    "lint": "tslint -c tslint.json 'src/**/*.ts'  -e '**/@types/**' ",
+    "fix-lint": "tslint --fix -c tslint.json 'src/**/*.ts'  -e '**/@types/**'",
     "build": "tsc",
-    "pretty-and-lint": "concurrently \"npm run pretty\" \"npm run lint\""
+    "done": "concurrently \"npm run pretty\" \"npm run fix-lint\" \"npm run lint\" \"npm run build\""
   },
   "repository": {
     "type": "git",
@@ -41,19 +41,18 @@
     "minimist": "^1.2.0",
     "reflect-metadata": "^0.1.12",
     "simple-git": "^1.102.0",
-    "typedi": "^0.8.0"
+    "tslib": "^1.9.3",
+    "typedi": "^0.8.0",
+    "window-size": "^1.1.1"
   },
   "devDependencies": {
+    "@types/blessed": "^0.1.10",
     "@types/minimist": "^1.2.0",
     "@types/node": "^10.10.1",
     "concurrently": "^4.0.1",
     "husky": "^1.1.2",
-    "performance-now": "^2.1.0",
     "tslint": "^5.11.0",
     "tslint-config-prettier": "^1.15.0",
     "typescript": "^3.1.1"
-  },
-  "husky": {
-    "hooks": {}
   }
 }
