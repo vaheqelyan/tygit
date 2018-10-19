@@ -5,6 +5,8 @@ import Git from "./git";
 import MSG from "./messages/statusBar";
 import Screen from "./screen";
 
+import { setColumnForStatusBar, setRowForStatusBar, STATUS_BAR_HEIGHT } from "./fn/layout";
+
 @Service()
 class StatusBar {
 	public element: blessed.Widgets.BoxElement;
@@ -17,9 +19,7 @@ class StatusBar {
 	public getElement() {
 		return this.element;
 	}
-	public z() {
-		console.log("asdasd", this);
-	}
+
 	public appendAndRender() {
 		this.element = this.createElement();
 		this.screenFactory.screen.append(this.element);
@@ -114,11 +114,11 @@ class StatusBar {
 	public createElement() {
 		const statusBar = blessed.box({
 			border: "line",
-			bottom: 0,
 			content: MSG.LOADING,
-			height: "shrink",
+			height: STATUS_BAR_HEIGHT,
 			tags: true,
-			width: "99%",
+			top: setColumnForStatusBar(this.screenFactory.getTerminalHeight()),
+			width: setRowForStatusBar(this.screenFactory.getTerminalWidth()),
 		});
 
 		return statusBar;
