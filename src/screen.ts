@@ -14,6 +14,10 @@ import MSG from "./messages/statusBar";
 import PullInput from "./pullPrompt";
 import PushInput from "./pushPrompt";
 
+import * as size from "window-size";
+
+import { setColumnForStatus, setLeftColumn, setLeftRow, setTopForStatus } from "./fn/layout";
+
 export default class Screen {
 	public CtrlPPress = new Date();
 
@@ -34,7 +38,7 @@ export default class Screen {
 	@Inject() public statusBarFactory: StatusBar;
 	@Inject(() => Diff)
 	public diffFactory: Diff;
-	public screen: blessed.Widgets.Screen = this.createScreen();
+	public screen: blessed.Widgets.Screen;
 
 	@Inject() public pullInput: PullInput;
 
@@ -46,11 +50,38 @@ export default class Screen {
 	public msgFactory: Message;
 
 	public curElement: string | "Status" | "Diff" | "Branches";
+
+	private terminalEncode: string;
 	private pullDataRes: string = null;
 
+	private terminalSize: { width: number; height: number };
+	constructor(container) {
+		this.terminalEncode = container.get("terminal");
+		this.screen = this.createScreen();
+	}
+
+	public getTerminalWidth() {
+		return this.terminalSize.width;
+	}
+
+	public getTerminalHeight() {
+		return this.terminalSize.height;
+	}
+
+	public getTerminalSize() {
+		return this.terminalSize;
+	}
+
 	public initStateAndRender() {
-		this.branchFactory.appendToScreen("Branches", [], "30%", "20%");
-		this.statusFactory.appendToScreen("Status", [], "30%", "75%", "20%");
+		const { width, height } = this.terminalSize;
+		this.branchFactory.appendToScreen("Branches", [], setLeftRow(width), setLeftColumn(height));
+		this.statusFactory.appendToScreen(
+			"Status",
+			[],
+			setLeftRow(width),
+			setColumnForStatus(height),
+			setTopForStatus(height),
+		);
 		this.diffFactory.appendToScreen();
 		this.statusBarFactory.appendToScreen();
 
@@ -73,6 +104,7 @@ export default class Screen {
 		this.screen.screen.render();
 	}
 	public createScreen() {
+		this.terminalSize = size;
 		const screen = blessed.screen({
 			autoPadding: true,
 			cursor: {
@@ -82,12 +114,31 @@ export default class Screen {
 				shape: "line",
 			},
 			debug: true,
-			fastCSR: true,
 			dockBorders: true,
+			fastCSR: true,
 			resizeTimeout: 300,
 			title: "widget test",
 			warnings: false,
 		});
+
+		const osType = process.platform;
+		if (this.terminalEncode) {
+			screen.setTerminal(this.terminalEncode);
+		} else {
+			switch (osType) {
+				case "win32":
+					screen.setTerminal("windows-ansi");
+					break;
+
+				case "darwin":
+					screen.setTerminal("xterm-256color");
+					break;
+
+				default:
+					screen.setTerminal("linux");
+			}
+		}
+
 		screen.key(["escape", "q"], () => {
 			return process.exit(0);
 		});
@@ -112,6 +163,12 @@ export default class Screen {
 		}); // Track files
 		this.screen.key("C-p", this.ctrlPKey); // Pull
 		this.screen.key("p", this.pushKey); // Push
+
+		this.screen.key(["q", "escape"], this.exit);
+	}
+
+	public exit() {
+		process.exit();
 	}
 
 	public onFocus(cur: blessed.Widgets.BlessedElement, old: blessed.Widgets.BlessedElement) {
@@ -130,12 +187,10 @@ export default class Screen {
 			this.screen.render();
 		}
 	}
-	public onKeyPress(ch: string, key: blessed.Widgets.Events.IKeyEventArg) {
+	public onKeyPress() {
+		const key: blessed.Widgets.Events.IKeyEventArg = arguments[1];
 		if (key.name === "tab") {
 			return key.shift ? this.screen.focusPrevious() : this.screen.focusNext();
-		}
-		if (key.name === "escape" || key.name === "q") {
-			return process.exit(0);
 		}
 	}
 	public handlePullClose = () => {
@@ -145,7 +200,7 @@ export default class Screen {
 			this.statusBarFactory.toogleContent(MSG.PULLED);
 		}
 
-		this.reload(true,false);
+		this.reloadFn(true, false);
 	};
 	public ctrlPKey = () => {
 		const n = new Date();
@@ -171,7 +226,6 @@ export default class Screen {
 		setTimeout(() => {
 			if (this.diffTime <= 200) {
 				if (this.pushDeb) {
-					console.log("push input");
 					this.pushInput.prompt("Push", "PUSH");
 				}
 				this.pushDeb = !this.pushDeb;
@@ -212,7 +266,7 @@ export default class Screen {
 		this.gitFactory.pullNoArgs(this.handlePull, this.handlePullClose);
 	}
 
-	public reload = (forceStatus: boolean = false, showTitle:boolean = true) => {
+	public reloadFn = (forceStatus: boolean = false, showTitle: boolean = true) => {
 		if (this.curElement === "Status" || forceStatus) {
 			if (showTitle) {
 				this.statusBarFactory.setTitleAndRender(MSG.RELOAD);
@@ -242,6 +296,10 @@ export default class Screen {
 				this.screen.render();
 			});
 		}
+	};
+
+	public reload = () => {
+		this.reloadFn();
 	};
 
 	public merge = () => {
