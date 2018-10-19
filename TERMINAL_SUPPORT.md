@@ -23,6 +23,7 @@ Screenshots of terminals working for me, I'm sitting on windows, so i have not t
 ### PowerShell
 
 ![](https://res.cloudinary.com/dmtrk3yns/image/upload/q_auto:best/v1539850964/tygit_terminal_support/ice_screenshot_20181017-191244.jpg)
+> Displays different colors
 
 ---
 
