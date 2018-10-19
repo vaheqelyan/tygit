@@ -13,15 +13,23 @@ class Message {
 		this.element = blessed.question({
 			border: "line",
 			height: "shrink",
-			keys: true,
-			label: " {bold}Rejected{/bold} ",
+			keys: false,
+			label: " {bold}{red-fg}Rejected{/red-fg}{/bold} ",
 			left: "center",
 			parent: this.screenFactory.screen,
+			style: {
+				border: {
+					fg: "red",
+				},
+			},
 			tags: true,
 			top: "center",
-			vi: true,
+			vi: false,
 			width: "half",
 		});
+
+		this.element.remove(this.element._.cancel);
+		this.element.remove(this.element._.okay);
 
 		this.element.ask(msg, cb);
 	}
