@@ -1,6 +1,6 @@
 {
   "name": "tygit",
-  "version": "0.1.2",
+  "version": "1.0.0",
   "description": "A terminal interface for git",
   "main": "build/index.js",
   "bin": {
