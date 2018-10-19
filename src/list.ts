@@ -8,12 +8,12 @@ export default abstract class List {
 	public screenFactory: Screen;
 	protected element: blessed.Widgets.ListElement = null;
 
-	public appendToScreen(label, items, width, height, top?: string) {
+	public appendToScreen(label, items, width, height, top?: number) {
 		this.makeElement(label, items, width, height, top);
 		this.screenFactory.screen.append(this.element);
 	}
 
-	public makeElement(label: string, items: string[], width: string, height: string, top?: string) {
+	public makeElement(label: string, items: string[], width: number, height: number, top?: number) {
 		this.element = blessed.list({
 			align: "left",
 			border: {
@@ -34,6 +34,7 @@ export default abstract class List {
 				},
 			},
 			style: {
+				// @ts-ignore
 				bg: "default",
 				border: {
 					bg: "default",
@@ -49,38 +50,19 @@ export default abstract class List {
 			top,
 			width,
 		});
-		this.element.on("keypress", this.onSelect.bind(this));
+		this.element.key("down", this.onDown);
+		this.element.key("up", this.onUp);
+
+		this.element.key("enter", this.onEnter.bind(this));
 	}
 
-	public onSelect = (ch: string, key: blessed.Widgets.Events.IKeyEventArg) => {
-		if (key.name === "up" || key.name === "k") {
-			this.element.up();
-
-			if (this.onUp) {
-				this.onUp();
-			}
-			this.screenFactory.screen.render();
-			return;
-		} else if (key.name === "down" || key.name === "j") {
-			this.element.down();
-
-			if (this.onDown) {
-				this.onDown();
-			}
-			this.screenFactory.screen.render();
-
-			return;
-		} else if (key.name === "enter") {
-			if (this.onEnter) {
-				this.onEnter();
-			}
-		}
-	};
 	public focus() {
 		this.element.focus();
 	}
 	public getSelected(): blessed.Widgets.BlessedElement {
+		// @ts-ignore
 		if (this.element.items.length > 0) {
+			// @ts-ignore
 			const { selected } = this.element;
 			return this.element.getItem(selected);
 		}
@@ -114,12 +96,31 @@ export default abstract class List {
 		return fileName.split(" ")[1];
 	}
 	public enable() {
-		this.element.addListener("keypress", this.onSelect);
+		this.element.key("up", this.onUp);
+		this.element.key("down", this.onDown);
+		this.element.key("enter", this.onEnter);
 	}
 	public disable() {
-		this.element.removeListener("keypress", this.onSelect);
+		this.element.unkey("up", this.onUp);
+		this.element.unkey("down", this.onDown);
+		this.element.unkey("enter", this.onEnter);
 	}
-	protected onUp?(): void;
-	protected onDown?(): void;
-	protected abstract onEnter?(): void;
+	protected onSelect?(): void;
+
+	protected abstract onEnter(): void;
+	private onUp = () => {
+		// @ts-ignore
+		this.element.up();
+		if (this.onSelect) {
+			this.onSelect();
+		}
+	};
+
+	private onDown = () => {
+		// @ts-ignore
+		this.element.down();
+		if (this.onSelect) {
+			this.onSelect();
+		}
+	};
 }
