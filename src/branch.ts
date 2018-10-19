@@ -27,7 +27,7 @@ class Branches extends List {
 	public switchBranchHandle = () => {
 		const selected = this.getSelected();
 		const branchName = selected.getText();
-
+		// @ts-ignore
 		this.element.items.forEach((value: blessed.Widgets.ListElement, index) => {
 			const t = value.getText();
 			if (t === branchName) {
@@ -35,6 +35,7 @@ class Branches extends List {
 			}
 			if (t.split("*").length > 1) {
 				const getByIndex = this.element.getItemIndex(index);
+				// @ts-ignore
 				this.element.getItem(getByIndex).setText(this.gitFactory.branches.current);
 				this.gitFactory.branches.current = branchName;
 			}
@@ -57,7 +58,7 @@ class Branches extends List {
 			}
 		});
 	};
-	public onEnter() {
+	public onEnter = () => {
 		const selected = this.getSelected();
 		if (selected) {
 			const branchName = selected.getText();
@@ -67,7 +68,7 @@ class Branches extends List {
 				this.disable();
 			}
 		}
-	}
+	};
 
 	public reload() {
 		let val = null;
@@ -78,7 +79,9 @@ class Branches extends List {
 
 			return this.gitFactory.branches.current === value ? `* ${value}` : value;
 		});
+		// @ts-ignore
 		this.element.setItems(uiBranchComputed);
+		// @ts-ignore
 		const ind = this.element.getItemIndex(`* ${val}`);
 		this.element.select(ind);
 	}
@@ -88,8 +91,11 @@ class Branches extends List {
 	}
 
 	public deleteBranchHandle(branchName) {
+		// @ts-ignore
 		for (let i = 0; i < this.element.items.length; i++) {
+			// @ts-ignore
 			if (this.element.getItem(this.element.items[i]).getText() === branchName) {
+				// @ts-ignore
 				this.element.removeItem(this.element.getItem(this.element.items[i]));
 			}
 		}
