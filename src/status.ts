@@ -7,6 +7,7 @@ import buildStatusArray from "./fn/buildStatusArray";
 import Git from "./git";
 import MSG from "./messages/statusBar";
 import StatusBar from "./statusBar";
+
 @Service()
 class Status extends List {
 	@Inject(() => Git)
@@ -20,17 +21,6 @@ class Status extends List {
 
 	@Inject(() => CommitFileInput)
 	public commitFilePrompt: CommitFileInput;
-
-	public onUp() {
-		this.setStatusBarSelectedTitle();
-		this.diffFactory.diffOnFocus();
-		this.screenFactory.screen.render();
-	}
-	public onDown() {
-		this.setStatusBarSelectedTitle();
-		this.diffFactory.diffOnFocus();
-		this.screenFactory.screen.render();
-	}
 
 	public onEnter() {
 		const selected = this.getSelected();
@@ -49,6 +39,7 @@ class Status extends List {
 	public afterTrack() {
 		this.statusBarFactory.toogleContent(MSG.TRACKED);
 		for (const [key] of this.gitFactory.gitMapStatus) {
+			// @ts-ignore
 			const getValue = this.getElement().getItem(`??  ${key}`);
 			if (getValue) {
 				getValue.setContent(`{green-bg} {white-fg}{bold}A{/bold}{/white-fg} {/green-bg} ${key}`);
@@ -69,7 +60,8 @@ class Status extends List {
 				Cleaning after without calling git status --short after each file staging
 				It is a little safe :) WIP
 			*/
-			this.screenFactory.reload(true);
+			this.statusBarFactory.toogleContent(MSG.TRACKED);
+			this.screenFactory.reloadFn(true, false);
 		});
 		this.statusBarFactory.setTitleAndRender(MSG.TRACKING);
 	}
@@ -97,6 +89,12 @@ class Status extends List {
 		if (select) {
 			this.diffFactory.diffOnFocus();
 		}
+	}
+
+	protected onSelect() {
+		this.setStatusBarSelectedTitle();
+		this.diffFactory.diffOnFocus();
+		this.screenFactory.screen.render();
 	}
 }
 
