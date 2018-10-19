@@ -43,7 +43,7 @@ class PullInput extends Prompt {
 			this.statusBarFactory.toogleContent(MSG.PULLED);
 		}
 
-		this.screenFactory.reload(true);
+		this.screenFactory.reloadFn(true, false);
 	};
 }
 export default PullInput;
