@@ -32,10 +32,10 @@ tygit ../git-repo
 - [ ] Run git reset
 - [ ] Better message output
 
-> I did not include the resolution of conflicts in this list, because I believe that resolving conflicts with the terminal will no make you productive at all, especially working with large files.
+> I did not include the resolution of conflicts in this list, because I believe that resolving conflicts with the terminal will not make you productive at all, especially working with large files.
 
 See the [Cheat Sheet](https://github.com/vaheqelyan/tygit/blob/master/CHEAT_SHEET.md)
 
 ---
 
-The basic implementation of GIT commands that we use every day, only with a good terminal interface, inspired by [inspired by lazygit](https://github.com/jesseduffield/lazygit)
+The basic implementation of GIT commands that we use every day, only with a good terminal interface, inspired by [lazygit](https://github.com/jesseduffield/lazygit)
