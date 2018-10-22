@@ -1,4 +1,4 @@
-Screenshots of terminals working for me, I'm sitting on windows, so i have not tested on UNIX terminals or on iterm.
+Screenshots of the terminal. Let me know how it works in other terminals
 
 **Open the issue and send us a screenshot**
 
