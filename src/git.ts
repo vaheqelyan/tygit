@@ -251,6 +251,19 @@ class Git {
 	public removeFromStatusMap(item) {
 		this.gitMapStatus.delete(item);
 	}
+
+	public clearStatus() {
+		this.gitMapStatus.clear();
+	}
+
+	public clearUntracked() {
+		this.gitMapStatus.clear();
+		for (const [key, value] of this.gitMapStatus) {
+			if (value === "??") {
+				this.gitMapStatus.delete(key);
+			}
+		}
+	}
 }
 
 export default Git;
