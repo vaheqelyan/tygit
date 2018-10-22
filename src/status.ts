@@ -60,6 +60,7 @@ class Status extends List {
 				Cleaning after without calling git status --short after each file staging
 				It is a little safe :) WIP
 			*/
+			this.gitFactory.clearUntracked();
 			this.statusBarFactory.toogleContent(MSG.TRACKED);
 			this.screenFactory.reloadFn(true, false);
 		});
