@@ -26,7 +26,7 @@ class Diff {
 				if (diff.length > 0) {
 					this.element.setContent(diff);
 				} else {
-					this.element.setContent("wait diffing ....");
+					this.element.setContent("Wait a second, please...");
 				}
 			}
 		}
