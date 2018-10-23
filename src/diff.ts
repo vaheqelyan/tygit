@@ -58,7 +58,7 @@ class Diff {
 			keys: true,
 			label: "Diff",
 			left: setDiffRowPosition(width),
-			mouse: true,
+			mouse: false,
 			right: 0,
 			scrollable: true,
 			scrollbar: {
@@ -66,6 +66,7 @@ class Diff {
 			},
 			style: {
 				bg: "default",
+				bold:true,
 				border: {
 					fg: "#f0f0f0",
 				},
@@ -74,7 +75,7 @@ class Diff {
 					bg: "green",
 				},
 			},
-			tags: true,
+			tags: false,
 			width: setRowForDiff(width),
 		});
 
