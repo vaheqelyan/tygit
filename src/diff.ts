@@ -17,13 +17,14 @@ class Diff {
 	public screenFactory: Screen;
 
 	public diffOnFocus() {
+		const diffs = this.gitFactory.getDiffs();
 		const selected = this.statusFactory.getSelected();
 		if (selected) {
 			const getFileName = this.statusFactory.parseFileName(selected.getText());
-			if (this.gitFactory.diffs.has(getFileName)) {
-				const diff = this.gitFactory.diffs.get(getFileName);
+			if (diffs.has(getFileName)) {
+				const diff = diffs.get(getFileName);
 				if (diff.length > 0) {
-					this.element.setContent(diff);
+					this.element.setContent(diff)
 				} else {
 					this.element.setContent("wait diffing ....");
 				}
@@ -37,10 +38,11 @@ class Diff {
 		this.screenFactory.screen.render();
 	}
 	public reload() {
+		const diffs = this.gitFactory.getDiffs();
 		const fileName = this.statusFactory.getSelectedFileName();
 		if (fileName) {
-			if (this.gitFactory.diffs.has(fileName)) {
-				this.element.setContent(this.gitFactory.diffs.get(fileName));
+			if (diffs.has(fileName)) {
+				this.element.setContent(diffs.get(fileName));
 			}
 		}
 	}
@@ -87,12 +89,14 @@ class Diff {
 		this.screenFactory.screen.append(this.element);
 	}
 	public observerForMap = path => {
+		const diffs = this.gitFactory.getDiffs();
+
 		const selected = this.statusFactory.getSelected();
 		if (selected) {
 			const getPath = this.statusFactory.parseFileName(selected.getText());
 			if (getPath === path) {
-				if (this.gitFactory.diffs.has(getPath)) {
-					const getDiffResult = this.gitFactory.diffs.get(getPath);
+				if (diffs.has(getPath)) {
+					const getDiffResult = diffs.get(getPath);
 					if (getDiffResult.length > 0) {
 						this.element.setContent(getDiffResult);
 						this.screenFactory.screen.render();
