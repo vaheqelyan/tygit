@@ -37,7 +37,7 @@ class Branches extends List {
 				const getByIndex = this.element.getItemIndex(index);
 				// @ts-ignore
 				this.element.getItem(getByIndex).setText(this.gitFactory.branches.current);
-				this.gitFactory.branches.current = branchName;
+				this.gitFactory.setCurrentBracnh(branchName);
 			}
 		});
 
@@ -72,12 +72,13 @@ class Branches extends List {
 
 	public reload() {
 		let val = null;
-		const uiBranchComputed: string[] = this.gitFactory.branches.all.map((value: string) => {
-			if (this.gitFactory.branches.current === value) {
+		const uiBranchComputed: string[] = this.gitFactory.getAllBranches().map((value: string) => {
+			const currentBranch = this.gitFactory.getCurrentBranch();
+			if (currentBranch === value) {
 				val = value;
 			}
 
-			return this.gitFactory.branches.current === value ? `* ${value}` : value;
+			return currentBranch === value ? `* ${value}` : value;
 		});
 		// @ts-ignore
 		this.element.setItems(uiBranchComputed);
