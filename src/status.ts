@@ -30,7 +30,7 @@ class Status extends List {
 	}
 
 	public reload(selectZeroItem: boolean = true) {
-		this.element.setItems(buildStatusArray(this.gitFactory.gitMapStatus));
+		this.element.setItems(buildStatusArray(this.gitFactory.getStatuMap()));
 		if (selectZeroItem) {
 			this.element.select(0);
 		}
@@ -38,12 +38,13 @@ class Status extends List {
 
 	public afterTrack() {
 		this.statusBarFactory.toogleContent(MSG.TRACKED);
-		for (const [key] of this.gitFactory.gitMapStatus) {
+		const status = this.gitFactory.getStatuMap();
+		for (const [key] of status) {
 			// @ts-ignore
 			const getValue = this.getElement().getItem(`??  ${key}`);
 			if (getValue) {
 				getValue.setContent(`{green-bg} {white-fg}{bold}A{/bold}{/white-fg} {/green-bg} ${key}`);
-				this.gitFactory.gitMapStatus.set(key, "A");
+				status.set(key, "A");
 			}
 		}
 		this.screenFactory.screen.render();
@@ -76,11 +77,11 @@ class Status extends List {
 	}
 
 	public setStatusBarSelectedTitle() {
-		if (this.gitFactory.diffSummary !== null) {
+		if (this.gitFactory.getDiffSummary() !== null) {
 			const sel = this.getSelected();
 			if (sel) {
 				const fileName = sel.getText();
-				this.statusBarFactory.setFileTitle(this.parseFileName(fileName), this.parseFileStatusType(fileName), false);
+				this.statusBarFactory.setFileTitle(this.parseFileName(fileName), this.parseFileStatusType(fileName));
 			}
 		}
 	}
