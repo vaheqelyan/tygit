@@ -22,17 +22,16 @@ class CommitFileInput extends Prompt {
 
 	public handle(fileName) {
 		this.statusBarFactory.setTitleAndRender(MSG.COMMITED);
-		this.gitFactory.async.diffSummary((err: Error, res: any) => {
-			if (err) {
-				console.log(err);
-			}
-			this.gitFactory.diffSummary = res;
+
+		this.gitFactory.initDiffSummary(() => {
 			this.statusBarFactory.resetContent();
 		});
+
 		this.statusFactory.getElement().removeItem(this.statusFactory.getSelected());
-		if (this.gitFactory.diffs.has(fileName)) {
+		const diffs = this.gitFactory.getDiffs();
+		if (diffs.has(fileName)) {
 			this.diffFactory.element.setContent(" ");
-			this.gitFactory.diffs.delete(fileName);
+			diffs.delete(fileName);
 		}
 		this.gitFactory.removeFromStatusMap(fileName);
 		this.statusFactory.selectingNext();
@@ -44,11 +43,7 @@ class CommitFileInput extends Prompt {
 
 	public handleCommitAll = () => {
 		this.statusBarFactory.setTitleAndRender(MSG.COMMITED);
-		this.gitFactory.async.diffSummary((err: Error, res: any) => {
-			if (err) {
-				console.log(err);
-			}
-			this.gitFactory.diffSummary = res;
+		this.gitFactory.initDiffSummary(() => {
 			this.statusBarFactory.resetContent();
 		});
 
