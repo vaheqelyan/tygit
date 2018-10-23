@@ -6,18 +6,15 @@ import { ExecException, execFile, spawn } from "child_process";
 import * as lupus from "lupus";
 
 class Git {
-	public dir: string;
-	public gitStatus: git.StatusResult;
-	public async: SimpleGitAsync.SimpleGitAsync;
-	public branches: git.BranchSummary = { all: [], detached: false, current: "", branches: {} };
-	public g: git.SimpleGit;
-	public diffSummary: git.DiffResult = null;
-	public diffs: Map<string, string> = new Map();
-	public gitMapStatus: Map<string, string> = new Map();
-	public remoteList: any;
+	private dir: string;
+	private gitStatus: git.StatusResult;
+	private async: SimpleGitAsync.SimpleGitAsync;
+	private branches: git.BranchSummary;
+	private diffSummary: git.DiffResult;
+	private diffs: Map<string, string> = new Map();
+	private gitMapStatus: Map<string, string> = new Map();
 	constructor(container) {
 		this.dir = container.get("git-path");
-		this.g = git(this.dir);
 		this.async = SimpleGitAsync(this.dir);
 	}
 	public runCmd(cmd: ReadonlyArray<string>, cb: (err: ExecException, stdout: string) => void) {
@@ -57,6 +54,8 @@ class Git {
 			}
 		});
 		return lines.join("\n");
+
+		return diff;
 	}
 
 	public startDiffing(observerCallback: (fnam: string) => void) {
@@ -66,19 +65,22 @@ class Git {
 				const filePath = keys[n];
 				const getFlag = this.gitMapStatus.get(filePath);
 				if (getFlag.length > 1) {
-					this.runCmd(["diff", "--no-color", filePath], (err, out) => {
+					this.runCmd(["diff", "--no-color", "--ignore-space-at-eol", "-b", "-w", filePath], (err, out) => {
 						if (err) {
 							console.log(err);
 						}
+
 						this.diffs.set(filePath, this.parseDiff(out));
+
 						observerCallback(filePath);
 					});
 				} else {
-					this.runCmd(["diff", "--no-color", "HEAD", filePath], (err, out) => {
+					this.runCmd(["diff", "--no-color", "--ignore-space-at-eol", "-b", "-w", "HEAD", filePath], (err, out) => {
 						if (err) {
 							console.log(err);
 						}
 						this.diffs.set(filePath, this.parseDiff(out));
+
 						observerCallback(filePath);
 					});
 				}
@@ -263,6 +265,30 @@ class Git {
 				this.gitMapStatus.delete(key);
 			}
 		}
+	}
+
+	public getAllBranches() {
+		return this.branches.all;
+	}
+
+	public getCurrentBranch(): string {
+		return this.branches.current;
+	}
+
+	public setCurrentBracnh(bName: string) {
+		this.branches.current = bName;
+	}
+
+	public getDiffSummary(): git.DiffResult {
+		return this.diffSummary;
+	}
+
+	public getDiffs() {
+		return this.diffs;
+	}
+
+	public getStatuMap() {
+		return this.gitMapStatus;
 	}
 }
 
