@@ -177,7 +177,7 @@ export default class Screen {
 			old.setLabel(old.options.label);
 		}
 		if (cur.border) {
-			const { label } = cur.options.label;
+			const { label } = cur.options;
 			this.curElement = label;
 			cur.style.border.bold = true;
 			if (label === "Diff") {
