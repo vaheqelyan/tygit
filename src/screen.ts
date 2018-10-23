@@ -186,7 +186,7 @@ export default class Screen {
 				// Because tags are disabled for Widget-widget
 				cur.setLabel(blessed.parseTags(`{bold}Diff{/bold}`));
 			} else {
-				cur.setLabel(`{bold}${cur.options.label}{/bold}`);
+				cur.setLabel(`{bold}${label}{/bold}`);
 			}
 			if (label === "Status") {
 				this.statusFactory.setStatusBarSelectedTitle();
