@@ -24,7 +24,7 @@ class Diff {
 			if (diffs.has(getFileName)) {
 				const diff = diffs.get(getFileName);
 				if (diff.length > 0) {
-					this.element.setContent(diff)
+					this.element.setContent(diff);
 				} else {
 					this.element.setContent("wait diffing ....");
 				}
