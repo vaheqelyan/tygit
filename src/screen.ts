@@ -179,7 +179,8 @@ export default class Screen {
 		if (cur.border) {
 			this.curElement = cur.options.label;
 			cur.style.border.bold = true;
-			cur.setLabel(`{bold}${cur.options.label}{/bold}`);
+			// @ts-ignore
+			cur.setLabel(blessed.parseTags(`{bold}${cur.options.label}{/bold}`)); // parseTags - cause tags is disabled for Diff-Widget
 			if (cur.options.label === "Status") {
 				this.statusFactory.setStatusBarSelectedTitle();
 				this.diffFactory.diffOnFocus();
