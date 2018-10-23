@@ -2,6 +2,12 @@ Screenshots of the terminal. Let me know how it works in other terminals
 
 **Open the issue and send us a screenshot**
 
+> You can set encode for terminal
+
+```code 
+tygit ../sample --terminal linux 
+```
+
 ### cmd
 
 ![](https://res.cloudinary.com/dmtrk3yns/image/upload/q_auto:best/v1539850979/tygit_terminal_support/ice_screenshot_20181017-185504.jpg)
