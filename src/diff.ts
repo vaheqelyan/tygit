@@ -66,7 +66,7 @@ class Diff {
 			},
 			style: {
 				bg: "default",
-				bold:true,
+				bold: true,
 				border: {
 					fg: "#f0f0f0",
 				},
