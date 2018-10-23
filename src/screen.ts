@@ -177,11 +177,18 @@ export default class Screen {
 			old.setLabel(old.options.label);
 		}
 		if (cur.border) {
-			this.curElement = cur.options.label;
+			const { label } = cur.options.label;
+			this.curElement = label;
 			cur.style.border.bold = true;
-			// @ts-ignore
-			cur.setLabel(blessed.parseTags(`{bold}${cur.options.label}{/bold}`)); // parseTags - cause tags is disabled for Diff-Widget
-			if (cur.options.label === "Status") {
+			if (label === "Diff") {
+				// @ts-ignore
+				// Parsing tags using helper
+				// Because tags are disabled for Widget-widget
+				cur.setLabel(blessed.parseTags(`{bold}Diff{/bold}`));
+			} else {
+				cur.setLabel(`{bold}${cur.options.label}{/bold}`);
+			}
+			if (label === "Status") {
 				this.statusFactory.setStatusBarSelectedTitle();
 				this.diffFactory.diffOnFocus();
 			}
