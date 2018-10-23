@@ -26,51 +26,30 @@ class StatusBar {
 		this.screenFactory.screen.render();
 	}
 	public toogleContent(val1: string, val2: string = "", ms: number = 1800) {
-		this.element.setContent(
-			writeStatusBarContent(
-				this.gitFactory.branches.current,
-				this.gitFactory.diffSummary.insertions,
-				this.gitFactory.diffSummary.deletions,
-				val1,
-			),
-		);
-		this.screenFactory.screen.render();
+		this.setTitleAndRender(val1);
 
 		setTimeout(() => {
-			this.element.setContent(
-				writeStatusBarContent(
-					this.gitFactory.branches.current,
-					this.gitFactory.diffSummary.insertions,
-					this.gitFactory.diffSummary.deletions,
-					val2,
-				),
-			);
-			this.screenFactory.screen.render();
+			this.setTitleAndRender(val2);
 		}, ms);
 	}
 
 	public resetContent(r: boolean = true) {
-		this.element.setContent(
-			writeStatusBarContent(
-				this.gitFactory.branches.current,
-				this.gitFactory.diffSummary.insertions,
-				this.gitFactory.diffSummary.deletions,
-			),
-		);
+		this.setTitle();
 		if (r) {
 			this.screenFactory.screen.render();
 		}
 	}
 
+	public setTitle(title?: string) {
+		const dS = this.gitFactory.getDiffSummary();
+		if (dS) {
+			const { insertions, deletions } = dS;
+			this.element.setContent(writeStatusBarContent(this.gitFactory.getCurrentBranch(), insertions, deletions, title));
+		}
+	}
+
 	public setTitleAndRender(title: string, ren: boolean = true) {
-		this.element.setContent(
-			writeStatusBarContent(
-				this.gitFactory.branches.current,
-				this.gitFactory.diffSummary.insertions,
-				this.gitFactory.diffSummary.deletions,
-				title,
-			),
-		);
+		this.setTitle(title);
 		if (ren) {
 			this.screenFactory.screen.render();
 		}
@@ -80,7 +59,7 @@ class StatusBar {
 		this.toogleContent(MSG.RELOAD);
 	}
 
-	public setFileTitle(filePath: string, fileStatus: string | "?" | "A" | "M" | "D" | "R" | "U", res: boolean = true) {
+	public setFileTitle(filePath: string, fileStatus: string | "?" | "A" | "M" | "D" | "R" | "U") {
 		let edit = "";
 		switch (fileStatus) {
 			case "?":
@@ -107,8 +86,7 @@ class StatusBar {
 				edit = `{red-bg} {white-fg}{bold}U{/bold}{/white-fg} {/red-bg} ${filePath}`;
 				break;
 		}
-
-		this.setTitleAndRender(edit, res);
+		this.setTitle(edit);
 	}
 
 	public createElement() {
