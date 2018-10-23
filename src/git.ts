@@ -1,7 +1,7 @@
 import * as SimpleGitAsync from "simple-git";
 import * as git from "simple-git/promise";
 
-import { ExecException, execFile, spawn } from "child_process";
+import { exec, ExecException, execFile, spawn } from "child_process";
 
 import * as lupus from "lupus";
 
@@ -16,9 +16,6 @@ class Git {
 	constructor(container) {
 		this.dir = container.get("git-path");
 		this.async = SimpleGitAsync(this.dir);
-	}
-	public runCmd(cmd: ReadonlyArray<string>, cb: (err: ExecException, stdout: string) => void) {
-		execFile("git", cmd, { cwd: this.dir }, cb);
 	}
 
 	public switchBranch(bName: string, handleExec: () => void, handleExecError: (err: string) => void) {
@@ -35,55 +32,16 @@ class Git {
 		return this.gitStatus.modified.length > 0 || this.gitStatus.conflicted.length > 0;
 	}
 
-	public parseDiff(diff: string) {
-		const lines = diff.split("\n");
-		lines.forEach((value, index) => {
-			const [firstLetter] = value;
-
-			switch (firstLetter) {
-				case "+":
-					lines[index] = `{bold}{green-fg}${value}{/green-fg}{/bold}`;
-					break;
-
-				case "-":
-					lines[index] = `{bold}{red-fg}${value}{/red-fg}{/bold}`;
-					break;
-				case "@":
-					lines[index] = `{bold}{cyan-fg}${value}{/cyan-fg}{/bold}`;
-					break;
-			}
-		});
-		return lines.join("\n");
-
-		return diff;
-	}
-
 	public startDiffing(observerCallback: (fnam: string) => void) {
 		const keys = Array.from(this.diffs.keys());
 		if (keys.length > 0) {
 			lupus(0, keys.length, n => {
 				const filePath = keys[n];
 				const getFlag = this.gitMapStatus.get(filePath);
-				if (getFlag.length > 1) {
-					this.runCmd(["diff", "--no-color", "--ignore-space-at-eol", "-b", "-w", filePath], (err, out) => {
-						if (err) {
-							console.log(err);
-						}
-
-						this.diffs.set(filePath, this.parseDiff(out));
-
-						observerCallback(filePath);
-					});
-				} else {
-					this.runCmd(["diff", "--no-color", "--ignore-space-at-eol", "-b", "-w", "HEAD", filePath], (err, out) => {
-						if (err) {
-							console.log(err);
-						}
-						this.diffs.set(filePath, this.parseDiff(out));
-
-						observerCallback(filePath);
-					});
-				}
+				this.runDiff(getFlag.length > 1 ? "" : "HEAD", filePath, data => {
+					this.diffs.set(filePath, data);
+					observerCallback(filePath);
+				});
 			});
 		}
 	}
@@ -183,21 +141,6 @@ class Git {
 	public asyncDiff(cb) {
 		this.async.diff(cb);
 	}
-	public parseStatus(str: string) {
-		const toLines = str.split("\n");
-		toLines.pop();
-		for (const line of toLines) {
-			const s = line.split(" ").filter(empty => empty);
-			const flag: string = s[0];
-			const path = s[1];
-
-			if (flag !== "A" && flag !== "D" && flag !== "DD" && flag !== "??" && flag !== "AD") {
-				this.diffs.set(path, "");
-			}
-
-			this.gitMapStatus.set(path, flag);
-		}
-	}
 
 	public status(cb: () => void) {
 		this.runCmd(["status", "--short"], (err, out) => {
@@ -289,6 +232,38 @@ class Git {
 
 	public getStatuMap() {
 		return this.gitMapStatus;
+	}
+	private runCmd(cmd: ReadonlyArray<string>, cb: (err: ExecException, stdout: string) => void) {
+		execFile("git", cmd, { cwd: this.dir }, cb);
+	}
+
+	private runDiff(isHead: string, filePath: string, cb: (data: string) => void) {
+		exec(
+			`git diff --color ${isHead} ${filePath} | sed -r "s/^([^-+ ]*)[-+ ]/\\1/" | less -r`,
+			{ cwd: this.dir },
+			(err, data) => {
+				if (err) {
+					console.log(err);
+					return;
+				}
+				cb(data);
+			},
+		);
+	}
+	private parseStatus(str: string) {
+		const toLines = str.split("\n");
+		toLines.pop();
+		for (const line of toLines) {
+			const s = line.split(" ").filter(empty => empty);
+			const flag: string = s[0];
+			const path = s[1];
+
+			if (flag !== "A" && flag !== "D" && flag !== "DD" && flag !== "??" && flag !== "AD") {
+				this.diffs.set(path, "");
+			}
+
+			this.gitMapStatus.set(path, flag);
+		}
 	}
 }
 
