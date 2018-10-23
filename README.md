@@ -31,6 +31,7 @@ tygit ../git-repo
 - [ ] Write some implementations from scratch
 - [ ] Run git reset
 - [ ] Better message output
+- [x] Better implementation of git-diff
 
 > I did not include the resolution of conflicts in this list, because I believe that resolving conflicts with the terminal will not make you productive at all, especially working with large files.
 
