@@ -38,9 +38,9 @@ class PullInput extends Prompt {
 
 	private onClose = () => {
 		if (fuzzysearch("CONFLICT", this.dataRes)) {
-			this.statusBarFactory.toogleContent(MSG.PULLED_WITH_CONFLICT);
+			this.statusBarFactory.toggleContent(MSG.PULLED_WITH_CONFLICT);
 		} else {
-			this.statusBarFactory.toogleContent(MSG.PULLED);
+			this.statusBarFactory.toggleContent(MSG.PULLED);
 		}
 
 		this.screenFactory.reloadFn(true, false);

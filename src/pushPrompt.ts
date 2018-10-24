@@ -20,7 +20,7 @@ class PushInput extends Prompt {
 		} else if (fuzzysearch("fatal", str)) {
 			this.screenFactory.alertError(str);
 		} else {
-			this.statusBarFactory.toogleContent(`Ok::Pushed to ${this.gitFactory.getCurrentBranch()}`);
+			this.statusBarFactory.toggleContent(`Ok::Pushed to ${this.gitFactory.getCurrentBranch()}`);
 		}
 	};
 	public onSubmit(value) {

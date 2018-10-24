@@ -25,7 +25,7 @@ class StatusBar {
 		this.screenFactory.screen.append(this.element);
 		this.screenFactory.screen.render();
 	}
-	public toogleContent(val1: string, val2: string = "", ms: number = 1800) {
+	public toggleContent(val1: string, val2: string = "", ms: number = 1800) {
 		this.setTitleAndRender(val1);
 
 		setTimeout(() => {
@@ -56,7 +56,7 @@ class StatusBar {
 	}
 
 	public reload() {
-		this.toogleContent(MSG.RELOADED);
+		this.toggleContent(MSG.RELOADED);
 	}
 
 	public setFileTitle(filePath: string, fileStatus: string | "?" | "A" | "M" | "D" | "R" | "U") {
@@ -107,7 +107,7 @@ class StatusBar {
 		this.screenFactory.screen.append(this.element);
 	}
 	public loaded() {
-		this.toogleContent(MSG.LOADED);
+		this.toggleContent(MSG.LOADED);
 	}
 }
 

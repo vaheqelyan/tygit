@@ -21,7 +21,7 @@ class MergePrompt extends Prompt {
 	}
 
 	private handleMerge = () => {
-		this.statusBarFactory.toogleContent(MSG.MERGED);
+		this.statusBarFactory.toggleContent(MSG.MERGED);
 	};
 
 	private handleMergeError = err => {

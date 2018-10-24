@@ -37,7 +37,7 @@ class Status extends List {
 	}
 
 	public afterTrack() {
-		this.statusBarFactory.toogleContent(MSG.TRACKED);
+		this.statusBarFactory.toggleContent(MSG.TRACKED);
 		const status = this.gitFactory.getStatuMap();
 		for (const [key] of status) {
 			// @ts-ignore
@@ -62,7 +62,7 @@ class Status extends List {
 				It is a little safe :) WIP
 			*/
 			this.gitFactory.clearUntracked();
-			this.statusBarFactory.toogleContent(MSG.TRACKED);
+			this.statusBarFactory.toggleContent(MSG.TRACKED);
 			this.screenFactory.reloadFn(true, false);
 		});
 		this.statusBarFactory.setTitleAndRender(MSG.TRACKING);

@@ -203,9 +203,9 @@ export default class Screen {
 	}
 	public handlePullClose = () => {
 		if (fuzzysearch("CONFLICT", this.pullDataRes)) {
-			this.statusBarFactory.toogleContent(MSG.PULLED_WITH_CONFLICT);
+			this.statusBarFactory.toggleContent(MSG.PULLED_WITH_CONFLICT);
 		} else {
-			this.statusBarFactory.toogleContent(MSG.PULLED);
+			this.statusBarFactory.toggleContent(MSG.PULLED);
 		}
 
 		this.reloadFn(true, false);
@@ -262,7 +262,7 @@ export default class Screen {
 		} else if (fuzzysearch("reject", str)) {
 			this.alertError(str);
 		} else {
-			this.statusBarFactory.toogleContent("Ok::Pushed");
+			this.statusBarFactory.toggleContent("Ok::Pushed");
 		}
 	};
 	public push() {
