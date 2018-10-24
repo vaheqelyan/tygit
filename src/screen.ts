@@ -282,9 +282,11 @@ export default class Screen {
 			this.gitFactory.status(() => {
 				this.statusFactory.reload(false);
 				this.gitFactory.startDiffing(this.diffFactory.observerForMap);
-				if (showTitle) {
-					this.statusBarFactory.toogleContent(MSG.RELOADED);
-				}
+				this.screen.render();
+			});
+
+			this.gitFactory.initDiffSummary(() => {
+				this.statusBarFactory.reload();
 				this.screen.render();
 			});
 		} else {
@@ -296,7 +298,6 @@ export default class Screen {
 			this.gitFactory.status(() => {
 				this.statusFactory.reload();
 				this.gitFactory.startDiffing(this.diffFactory.observerForMap);
-				this.statusBarFactory.toogleContent(MSG.RELOADED);
 				this.screen.render();
 			});
 			this.gitFactory.initDiffSummary(() => {
