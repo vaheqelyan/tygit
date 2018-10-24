@@ -56,7 +56,7 @@ class StatusBar {
 	}
 
 	public reload() {
-		this.toogleContent(MSG.RELOAD);
+		this.toogleContent(MSG.RELOADED);
 	}
 
 	public setFileTitle(filePath: string, fileStatus: string | "?" | "A" | "M" | "D" | "R" | "U") {
