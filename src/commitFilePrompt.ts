@@ -24,7 +24,7 @@ class CommitFileInput extends Prompt {
 		this.statusBarFactory.setTitleAndRender(MSG.COMMITED);
 
 		this.gitFactory.initDiffSummary(() => {
-			this.statusBarFactory.resetContent();
+			this.statusBarFactory.toogleContent(MSG.COMMITED);
 		});
 
 		this.statusFactory.getElement().removeItem(this.statusFactory.getSelected());
