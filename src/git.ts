@@ -108,7 +108,7 @@ class Git {
 	}
 
 	public commitAllSpawn(message: string, handle: (data: Buffer) => void, onClose: (code: number) => void) {
-		const commit = spawn("git", ["commit", "-m", `${message}`], { cwd: this.dir });
+		const commit = this.gitSpawn(["commit", "-m", `${message}`]);
 		commit.stdout.on("data", handle);
 		commit.on("close", onClose);
 	}
@@ -124,31 +124,31 @@ class Git {
 	}
 
 	public commitFile(message: string, fileName: string, handle: (res: Buffer) => void, close: (code: number) => void) {
-		const commit = spawn("git", ["commit", "-m", `${message}`, fileName], { cwd: this.dir });
+		const commit = this.gitSpawn(["commit", "-m", `${message}`, fileName]);
 		commit.stdout.on("data", handle);
 		commit.on("close", close);
 	}
 
 	public pullNoArgs(handleExec: (data: Buffer) => void, onClose: (code: any) => void) {
-		const pull = spawn("git", ["pull"], { cwd: this.dir });
+		const pull = this.gitSpawn(["pull"]);
 		pull.stdout.on("data", handleExec);
 		pull.on("close", onClose);
 	}
 	public pull(value: string, handleExec: (data: Buffer) => void, onClose: (code: any) => void) {
-		const pull = spawn("git", ["pull", ...value.split(" ")], { cwd: this.dir });
+		const pull = this.gitSpawn(["pull", ...value.split(" ")]);
 		pull.stdout.on("data", handleExec);
 		pull.on("close", onClose);
 	}
 
 	public pushNoArgs(handleErr) {
 		const { current } = this.branches;
-		const ls = spawn("git", ["push", "origin", current], { cwd: this.dir });
-		ls.stderr.on("data", handleErr);
+		const push = this.gitSpawn(["push", "origin", current]);
+		push.stderr.on("data", handleErr);
 	}
 
-	public push(value, handle: (data: Buffer) => void) {
-		const ls = spawn("git", ["push", ...value.split(" ")], { cwd: this.dir });
-		ls.stderr.on("data", handle);
+	public push(value: string, handle: (data: Buffer) => void) {
+		const push = this.gitSpawn(["push", ...value.split(" ")]);
+		push.stderr.on("data", handle);
 	}
 	public asyncDiff(cb) {
 		this.async.diff(cb);
@@ -169,7 +169,7 @@ class Git {
 	}
 
 	public merge(branchName, handle: (res: Buffer) => void, close: (code: number) => void) {
-		const merge = spawn("git", ["merge", branchName], { cwd: this.dir });
+		const merge = this.gitSpawn(["merge", branchName]);
 		merge.stdout.on("data", handle);
 
 		merge.stderr.on("data", handle);
@@ -244,6 +244,9 @@ class Git {
 
 	public getStatuMap() {
 		return this.gitMapStatus;
+	}
+	private gitSpawn(cmd: string[]) {
+		return spawn("git", cmd, { cwd: this.dir });
 	}
 	private runCmd(cmd: ReadonlyArray<string>, cb: (err: ExecException, stdout: string) => void) {
 		execFile("git", cmd, { cwd: this.dir }, cb);
