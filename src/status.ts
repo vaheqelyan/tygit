@@ -93,6 +93,15 @@ class Status extends List {
 		}
 	}
 
+	public goDown() {
+		// @ts-ignore
+		this.element.down();
+	}
+	public goUp() {
+		// @ts-ignore
+		this.element.up();
+	}
+
 	protected onSelect() {
 		this.setStatusBarSelectedTitle();
 		this.diffFactory.diffOnFocus();
