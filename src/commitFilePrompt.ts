@@ -19,8 +19,12 @@ class CommitFileInput extends Prompt {
 	public statusBarFactory: StatusBar;
 	@Inject(() => Diff)
 	public diffFactory: Diff;
+	private fileName: string;
 
-	public handle(fileName) {
+	private spawnResponse: string;
+
+	public handle = () => {
+		const { fileName } = this;
 		this.statusBarFactory.setTitleAndRender(MSG.COMMITED);
 
 		this.gitFactory.initDiffSummary(() => {
@@ -36,9 +40,6 @@ class CommitFileInput extends Prompt {
 		this.gitFactory.removeFromStatusMap(fileName);
 		this.statusFactory.selectingNext();
 		this.screenFactory.screen.render();
-	}
-	public handleError = err => {
-		this.screenFactory.alertError(err);
 	};
 
 	public handleCommitAll = () => {
@@ -49,8 +50,8 @@ class CommitFileInput extends Prompt {
 
 		this.statusFactory.clearAfterCommit();
 		this.diffFactory.element.setContent("");
-		this.gitFactory.clearDiffs();
-		this.gitFactory.clearAfterCommmit();
+
+		this.gitFactory.clearAfterAllCommit();
 
 		this.screenFactory.screen.render();
 	};
@@ -58,9 +59,10 @@ class CommitFileInput extends Prompt {
 	public onSubmit(value) {
 		if (this.type === "COMMIT FILE") {
 			const fileName = this.statusFactory.getSelectedFileName();
-			this.gitFactory.commitFile(value, fileName, this.handle.bind(this, fileName), this.handleError);
+			this.fileName = fileName;
+			this.gitFactory.commitFile(value, fileName, this.setSpawnResponse, this.onClose);
 		} else if (this.type === "COMMIT") {
-			this.gitFactory.commit(value, this.handleCommitAll, this.handleError);
+			this.gitFactory.commitAllSpawn(value, this.setSpawnResponse, this.onClose);
 		}
 
 		this.statusBarFactory.setTitleAndRender(MSG.COMMITING, false);
@@ -68,5 +70,23 @@ class CommitFileInput extends Prompt {
 		this.screen.screen.remove(this.element);
 		this.screen.screen.render();
 	}
+
+	private onClose = code => {
+		if (code !== 0) {
+			this.screenFactory.alertError(this.spawnResponse);
+		} else {
+			if (this.type === "COMMIT FILE") {
+				this.handle();
+			} else if (this.type === "COMMIT") {
+				this.handleCommitAll();
+			}
+
+			this.spawnResponse = null;
+		}
+	};
+
+	private setSpawnResponse = (response: Buffer) => {
+		this.spawnResponse = response.toString();
+	};
 }
 export default CommitFileInput;
