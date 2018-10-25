@@ -243,9 +243,9 @@ export default class Screen {
 		}, 500);
 		this.PPress = n;
 	};
-	public alertError(err) {
+	public alertError(err: string) {
 		this.statusBarFactory.resetContent();
-		this.msgFactory.display(err, (msgErr, value) => {
+		this.msgFactory.display(err.trim(), (msgErr, value) => {
 			if (msgErr) {
 				console.log(msgErr);
 			}
@@ -286,7 +286,9 @@ export default class Screen {
 			});
 
 			this.gitFactory.initDiffSummary(() => {
-				this.statusBarFactory.reload();
+				if (showTitle) {
+					this.statusBarFactory.reload();
+				}
 				this.screen.render();
 			});
 		} else {
