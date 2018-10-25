@@ -52,7 +52,6 @@ export default abstract class List {
 		});
 		this.element.key("down", this.onDown);
 		this.element.key("up", this.onUp);
-
 		this.element.key("enter", this.onEnter.bind(this));
 	}
 
