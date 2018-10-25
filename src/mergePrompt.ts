@@ -13,19 +13,30 @@ class MergePrompt extends Prompt {
 	@Inject(() => StatusBar)
 	private statusBarFactory: StatusBar;
 
+	private spawnResponse: string;
+
 	public onSubmit(value) {
-		this.gitFactory.merge(value, this.handleMerge, this.handleMergeError);
-		this.screenFactory.screen.remove(this.element);
+		this.gitFactory.merge(value, this.handleSpawnData, this.onClose);
 		this.statusBarFactory.setTitleAndRender(MSG.MERGING, false);
+		this.screenFactory.screen.remove(this.element);
 		this.screenFactory.screen.render();
 	}
 
-	private handleMerge = () => {
-		this.statusBarFactory.toggleContent(MSG.MERGED);
+	private onClose = code => {
+		if (code !== 0) {
+			this.screenFactory.alertError(this.spawnResponse);
+		} else {
+			this.handleMerge();
+			this.spawnResponse = null;
+		}
 	};
 
-	private handleMergeError = err => {
-		this.screenFactory.alertError(err);
+	private handleSpawnData = (res: Buffer) => {
+		this.spawnResponse = res.toString();
+	};
+
+	private handleMerge = () => {
+		this.statusBarFactory.toggleContent(MSG.MERGED);
 	};
 }
 export default MergePrompt;
