@@ -23,7 +23,12 @@ class Diff {
 			const getFileName = this.statusFactory.parseFileName(selected.getText());
 			if (diffs.has(getFileName)) {
 				const diff = diffs.get(getFileName);
-				this.element.resetScroll();
+
+				const offset = this.element.getScrollPerc();
+				if (offset !== 0) {
+					this.element.resetScroll();
+				}
+
 				if (diff.length > 0) {
 					this.element.setContent(diff);
 				} else {
@@ -80,16 +85,18 @@ class Diff {
 			width: setRowForDiff(width),
 		});
 
+		el.key("C-down", this.moveListDown);
+
+		el.key("C-up", this.moveListUp);
+
 		return el;
-	}
-	public getElement() {
-		return this.element;
 	}
 
 	public appendToScreen() {
 		this.element = this.createElement();
 		this.screenFactory.screen.append(this.element);
 	}
+
 	public observerForMap = path => {
 		const diffs = this.gitFactory.getDiffs();
 
@@ -106,6 +113,21 @@ class Diff {
 				}
 			}
 		}
+	};
+
+	private moveListDown = () => {
+		this.statusFactory.goDown();
+		this.diffOnFocus();
+
+		this.statusFactory.setStatusBarSelectedTitle();
+		this.screenFactory.screen.render();
+	};
+	private moveListUp = () => {
+		this.statusFactory.goUp();
+		this.diffOnFocus();
+		this.statusFactory.setStatusBarSelectedTitle();
+
+		this.screenFactory.screen.render();
 	};
 }
 
