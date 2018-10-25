@@ -6,7 +6,8 @@ import { exec, ExecException, execFile, spawn } from "child_process";
 import * as lupus from "lupus";
 
 class Git {
-	private dir: string;
+	public dir: string;
+	private needReReload: boolean;
 	private gitStatus: git.StatusResult;
 	private async: SimpleGitAsync.SimpleGitAsync;
 	private branches: git.BranchSummary;
@@ -16,6 +17,15 @@ class Git {
 	constructor(container) {
 		this.dir = container.get("git-path");
 		this.async = SimpleGitAsync(this.dir);
+	}
+
+	public needReStatus() {
+		return this.needReReload;
+	}
+
+	public clearAfterAllCommit() {
+		this.clearDiffs();
+		this.clearStatus();
 	}
 
 	public switchBranch(bName: string, handleExec: () => void, handleExecError: (err: string) => void) {
@@ -97,6 +107,12 @@ class Git {
 		];
 	}
 
+	public commitAllSpawn(message: string, handle: (data: Buffer) => void, onClose: (code: number) => void) {
+		const commit = spawn("git", ["commit", "-m", `${message}`], { cwd: this.dir });
+		commit.stdout.on("data", handle);
+		commit.on("close", onClose);
+	}
+
 	public commit(message: string, handleExec: () => void, handleExecError: (err: string) => void) {
 		this.runCmd(["commit", "-m", `${message}`], err => {
 			if (err) {
@@ -107,14 +123,10 @@ class Git {
 		});
 	}
 
-	public commitFile(message: string, fileName: string, handleExec: () => void, handleExecError: (err: string) => void) {
-		this.runCmd(["commit", "-m", `${message}`, fileName], err => {
-			if (err) {
-				handleExecError(err.message.toString());
-				return;
-			}
-			handleExec();
-		});
+	public commitFile(message: string, fileName: string, handle: (res: Buffer) => void, close: (code: number) => void) {
+		const commit = spawn("git", ["commit", "-m", `${message}`, fileName], { cwd: this.dir });
+		commit.stdout.on("data", handle);
+		commit.on("close", close);
 	}
 
 	public pullNoArgs(handleExec: (data: Buffer) => void, onClose: (code: any) => void) {
@@ -143,7 +155,7 @@ class Git {
 	}
 
 	public status(cb: () => void) {
-		this.runCmd(["status", "--short"], (err, out) => {
+		this.runCmd(["status", "--porcelain"], (err, out) => {
 			if (err) {
 				console.log(err);
 			}
@@ -156,14 +168,12 @@ class Git {
 		});
 	}
 
-	public merge(branchName, handle: () => void, handleError: (err: string) => void) {
-		this.runCmd(["merge", branchName], err => {
-			if (err) {
-				handleError(err.message.toString());
-				return;
-			}
-			handle();
-		});
+	public merge(branchName, handle: (res: Buffer) => void, close: (code: number) => void) {
+		const merge = spawn("git", ["merge", branchName], { cwd: this.dir });
+		merge.stdout.on("data", handle);
+
+		merge.stderr.on("data", handle);
+		merge.on("close", close);
 	}
 
 	public newBranch(branchName, handle: () => void, handleError: (err: string) => void) {
@@ -193,8 +203,10 @@ class Git {
 		});
 	}
 
-	public removeFromStatusMap(item) {
-		this.gitMapStatus.delete(item);
+	public removeFromStatusMap(item: string) {
+		if (this.gitMapStatus.has(item)) {
+			this.gitMapStatus.delete(item);
+		}
 	}
 
 	public clearStatus() {
@@ -260,6 +272,10 @@ class Git {
 
 			if (flag !== "A" && flag !== "D" && flag !== "DD" && flag !== "??" && flag !== "AD") {
 				this.diffs.set(path, "");
+			}
+
+			if (flag.length > 1) {
+				this.needReReload = true;
 			}
 
 			this.gitMapStatus.set(path, flag);
