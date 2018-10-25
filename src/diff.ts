@@ -23,6 +23,7 @@ class Diff {
 			const getFileName = this.statusFactory.parseFileName(selected.getText());
 			if (diffs.has(getFileName)) {
 				const diff = diffs.get(getFileName);
+				this.element.resetScroll();
 				if (diff.length > 0) {
 					this.element.setContent(diff);
 				} else {
