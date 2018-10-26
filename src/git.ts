@@ -134,15 +134,17 @@ class Git {
 		pull.on("close", onClose);
 	}
 
-	public pushNoArgs(handleErr) {
+	public pushNoArgs(handleErr: (res: Buffer) => void, handleClose: (code: number) => void) {
 		const { current } = this.branches;
 		const push = this.gitSpawn(["push", "origin", current]);
 		push.stderr.on("data", handleErr);
+		push.on("close", handleClose);
 	}
 
-	public push(value: string, handle: (data: Buffer) => void) {
+	public push(value: string, handle: (data: Buffer) => void, handleClose: (code: number) => void) {
 		const push = this.gitSpawn(["push", ...value.split(" ")]);
 		push.stderr.on("data", handle);
+		push.on("close", handleClose);
 	}
 	public asyncDiff(cb) {
 		this.async.diff(cb);
