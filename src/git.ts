@@ -121,14 +121,16 @@ class Git {
 		commit.on("close", close);
 	}
 
-	public pullNoArgs(handleExec: (data: Buffer) => void, onClose: (code: any) => void) {
+	public pullNoArgs(handle: (data: Buffer) => void, onClose: (code: any) => void) {
 		const pull = this.gitSpawn(["pull"]);
-		pull.stdout.on("data", handleExec);
+		pull.stdout.on("data", handle);
+		pull.stderr.on("data", handle);
 		pull.on("close", onClose);
 	}
-	public pull(value: string, handleExec: (data: Buffer) => void, onClose: (code: any) => void) {
+	public pull(value: string, handle: (data: Buffer) => void, onClose: (code: any) => void) {
 		const pull = this.gitSpawn(["pull", ...value.split(" ")]);
-		pull.stdout.on("data", handleExec);
+		pull.stdout.on("data", handle);
+		pull.stderr.on("data", handle);
 		pull.on("close", onClose);
 	}
 
