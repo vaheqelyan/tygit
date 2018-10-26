@@ -52,7 +52,7 @@ export default class Screen {
 	public curElement: string | "Status" | "Diff" | "Branches";
 
 	private terminalEncode: string;
-	private pullDataRes: string = null;
+	private pullDataRes: string;
 
 	private terminalSize: { width: number; height: number };
 	constructor(container) {
@@ -201,15 +201,6 @@ export default class Screen {
 			return key.shift ? this.screen.focusPrevious() : this.screen.focusNext();
 		}
 	}
-	public handlePullClose = () => {
-		if (fuzzysearch("CONFLICT", this.pullDataRes)) {
-			this.statusBarFactory.toggleContent(MSG.PULLED_WITH_CONFLICT);
-		} else {
-			this.statusBarFactory.toggleContent(MSG.PULLED);
-		}
-
-		this.reloadFn(true, false);
-	};
 	public ctrlPKey = () => {
 		const n = new Date();
 		const differenceTravel = n.getTime() - this.CtrlPPress.getTime();
@@ -316,7 +307,22 @@ export default class Screen {
 	public merge = () => {
 		this.mergePrompt.prompt("Merging with branch", "MERGE");
 	};
+	private handlePullClose = code => {
+		if (code !== 0) {
+			if (fuzzysearch("conflict", this.pullDataRes)) {
+				this.pullDataRes = null;
+				this.statusBarFactory.toggleContent(MSG.PULLED_WITH_CONFLICT);
+				this.reloadFn(true, false);
+			} else {
+				this.alertError(this.pullDataRes);
+			}
+		} else {
+			this.pullDataRes = null;
+			this.statusBarFactory.setTitle(MSG.PULLED);
+			this.reloadFn(true, false);
+		}
+	};
 	private handlePull = (data: Buffer) => {
-		this.pullDataRes = data.toString("utf8");
+		this.pullDataRes = data.toString();
 	};
 }
