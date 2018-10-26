@@ -1,4 +1,4 @@
 export interface ICliOptions {
-	_: string[],
-	terminal:string
+	_: string[];
+	terminal: string;
 }
