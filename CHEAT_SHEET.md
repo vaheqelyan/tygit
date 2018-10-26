@@ -4,6 +4,7 @@
 >  Windows/Linux <kbd>Ctrl</kbd> + <kbd>A</kbd>
 >  OSX <kbd>⌘</kbd> + <kbd>A</kbd>
 > </pre>
+>
 > Track all unstaged files and folders
 
 ![](https://res.cloudinary.com/dmtrk3yns/image/upload/q_auto/v1539866586/tygit_cheat_sheet/gif/ezgif-4-393342f6e916.gif)
@@ -89,12 +90,10 @@
 
 ![](https://res.cloudinary.com/dmtrk3yns/image/upload/q_auto/v1539869428/tygit_cheat_sheet/gif/ezgif-4-f02ab90b4637.gif)
 
-
 > <pre>
 >  Windows/Linux <kbd>Ctrl</kbd> + <kbd>D</kbd>
 >  OSX <kbd>⌘</kbd> + <kbd>D</kbd>
 > </pre>
->
 
 ### Merge
 
@@ -102,6 +101,23 @@
 >  Windows/Linux <kbd>M</kbd>
 >  OSX <kbd>M</kbd>
 > </pre>
->
 
 ![](https://res.cloudinary.com/dmtrk3yns/image/upload/q_auto/v1539955346/tygit_cheat_sheet/gif/ezgif-4-0cece79ad2b1.gif)
+
+### Move up and down quickly with the CTRL key
+
+**Note.** Be sure you focused in diff-widget panel
+
+For moving up
+
+> <pre>
+>  Windows/Linux <kbd>Ctrl</kbd> + <kbd>↑</kbd>
+>  OSX <kbd>⌘</kbd> + <kbd>↑</kbd>
+
+For moving down
+
+> <pre>
+>  Windows/Linux <kbd>Ctrl</kbd> + <kbd>↓</kbd>
+>  OSX <kbd>⌘</kbd> + <kbd>↓</kbd>
+
+![](https://res.cloudinary.com/dmtrk3yns/image/upload/q_auto/v1540472681/tygit_cheat_sheet/gif/ezgif-5-ec3e6be68fbb.gif)
