@@ -23,10 +23,10 @@ class PullInput extends Prompt {
 	@Inject(() => Message)
 	public msgFactory: Message;
 
-	private dataRes: string;
+	private spawnResponse: string;
 
 	public handlePull = (data: Buffer) => {
-		this.dataRes = data.toString("utf8");
+		this.spawnResponse = data.toString();
 	};
 
 	public onSubmit(value) {
@@ -36,14 +36,20 @@ class PullInput extends Prompt {
 		this.screen.screen.render();
 	}
 
-	private onClose = () => {
-		if (fuzzysearch("CONFLICT", this.dataRes)) {
-			this.statusBarFactory.toggleContent(MSG.PULLED_WITH_CONFLICT);
+	private onClose = code => {
+		if (code !== 0) {
+			if (fuzzysearch("conflict", this.spawnResponse)) {
+				this.spawnResponse = null;
+				this.statusBarFactory.toggleContent(MSG.PULLED_WITH_CONFLICT);
+				this.screenFactory.reloadFn(true, false);
+			} else {
+				this.screenFactory.alertError(this.spawnResponse);
+			}
 		} else {
-			this.statusBarFactory.toggleContent(MSG.PULLED);
+			this.spawnResponse = null;
+			this.statusBarFactory.setTitle(MSG.PULLED);
+			this.screenFactory.reloadFn(true, false);
 		}
-
-		this.screenFactory.reloadFn(true, false);
 	};
 }
 export default PullInput;
