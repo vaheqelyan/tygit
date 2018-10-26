@@ -8,6 +8,10 @@ tygit ../git-repo
 
 ![](https://res.cloudinary.com/dmtrk3yns/image/upload/q_auto:best/v1539786875/asd_evufbh.jpg)
 
+### Prerequisites
+
+**sed** - You must have "sed", a unix utility that parses and transforms text. It is necessary to remove the leading plus/minus from the lines in diff.But mainly [v2.0.0](https://github.com/vaheqelyan/tygit/releases/tag/v2.0.0)
+
 ### Features/Goals
 
 - [x] Ability to commit file
