@@ -14,7 +14,7 @@ class Message {
 			border: "line",
 			height: "shrink",
 			keys: false,
-			label: " {bold}{red-fg}Rejected{/red-fg}{/bold} ",
+			label: " {bold}{red-fg}Response{/red-fg}{/bold} ",
 			left: "center",
 			parent: this.screenFactory.screen,
 			style: {
