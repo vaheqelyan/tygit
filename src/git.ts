@@ -56,16 +56,6 @@ class Git {
 		}
 	}
 
-	public initStatus(cb) {
-		this.async.status((err, data) => {
-			if (err) {
-				console.error(err);
-			}
-			this.gitStatus = data;
-			cb();
-		});
-	}
-
 	public initBranches(cb: () => void) {
 		this.async.branch((err, data) => {
 			if (err) {
@@ -110,6 +100,7 @@ class Git {
 	public commitAllSpawn(message: string, handle: (data: Buffer) => void, onClose: (code: number) => void) {
 		const commit = this.gitSpawn(["commit", "-m", `${message}`]);
 		commit.stdout.on("data", handle);
+		commit.stderr.on("data", handle);
 		commit.on("close", onClose);
 	}
 
@@ -126,6 +117,7 @@ class Git {
 	public commitFile(message: string, fileName: string, handle: (res: Buffer) => void, close: (code: number) => void) {
 		const commit = this.gitSpawn(["commit", "-m", `${message}`, fileName]);
 		commit.stdout.on("data", handle);
+		commit.stderr.on("data", handle);
 		commit.on("close", close);
 	}
 
