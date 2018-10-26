@@ -22,7 +22,6 @@ tygit ../git-repo
 - [x] Do a git push with extra parameters
 - [x] Ability to reload the working tree status
 - [x] Ability to show changes between commits, commit and working tree, etc
-- [ ] Toggle the characters "+ " and "-" when viewing differences
 - [ ] Show commit log when file changes
 - [ ] Support all terminals ( [See more](https://github.com/vaheqelyan/tygit/blob/master/TERMINAL_SUPPORT.md) )
 - [ ] Ability to ignore file
