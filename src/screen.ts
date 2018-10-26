@@ -52,7 +52,9 @@ export default class Screen {
 	public curElement: string | "Status" | "Diff" | "Branches";
 
 	private terminalEncode: string;
-	private pullDataRes: string;
+	private pullSpawnResponse: string;
+
+	private pushSpawnResponse: string;
 
 	private terminalSize: { width: number; height: number };
 	constructor(container) {
@@ -246,21 +248,14 @@ export default class Screen {
 			}
 		});
 	}
-	public handlePush = data => {
-		const str = data.toString("utf8");
-		if (fuzzysearch("fatal", str)) {
-			this.alertError(str);
-		} else if (fuzzysearch("reject", str)) {
-			this.alertError(str);
-		} else {
-			this.statusBarFactory.toggleContent("Ok::Pushed");
-		}
-	};
 	public push() {
-		this.gitFactory.pushNoArgs(this.handlePush);
+		this.pushSpawnResponse = null;
+		this.gitFactory.pushNoArgs(this.stdErrHandle, this.handlePushClose);
 		this.statusBarFactory.setTitleAndRender(MSG.PUSHING);
 	}
 	public pull() {
+		this.pullSpawnResponse = null;
+
 		this.statusBarFactory.setTitleAndRender(MSG.PULLING);
 		this.gitFactory.pullNoArgs(this.handlePull, this.handlePullClose);
 	}
@@ -307,22 +302,31 @@ export default class Screen {
 	public merge = () => {
 		this.mergePrompt.prompt("Merging with branch", "MERGE");
 	};
+	private stdErrHandle = (data: Buffer) => {
+		this.pushSpawnResponse = data.toString();
+	};
+
+	private handlePushClose = code => {
+		if (code !== 0) {
+			this.alertError(this.pushSpawnResponse);
+		} else {
+			this.statusBarFactory.toggleContent(MSG.PUSHED);
+		}
+	};
 	private handlePullClose = code => {
 		if (code !== 0) {
-			if (fuzzysearch("conflict", this.pullDataRes)) {
-				this.pullDataRes = null;
+			if (fuzzysearch("conflict", this.pullSpawnResponse)) {
 				this.statusBarFactory.toggleContent(MSG.PULLED_WITH_CONFLICT);
 				this.reloadFn(true, false);
 			} else {
-				this.alertError(this.pullDataRes);
+				this.alertError(this.pullSpawnResponse);
 			}
 		} else {
-			this.pullDataRes = null;
 			this.statusBarFactory.setTitle(MSG.PULLED);
 			this.reloadFn(true, false);
 		}
 	};
 	private handlePull = (data: Buffer) => {
-		this.pullDataRes = data.toString();
+		this.pullSpawnResponse = data.toString();
 	};
 }
