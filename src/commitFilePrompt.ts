@@ -57,6 +57,7 @@ class CommitFileInput extends Prompt {
 	};
 
 	public onSubmit(value) {
+		this.spawnResponse = null;
 		if (this.type === "COMMIT FILE") {
 			const fileName = this.statusFactory.getSelectedFileName();
 			this.fileName = fileName;
@@ -80,8 +81,6 @@ class CommitFileInput extends Prompt {
 			} else if (this.type === "COMMIT") {
 				this.handleCommitAll();
 			}
-
-			this.spawnResponse = null;
 		}
 	};
 
