@@ -22,6 +22,7 @@ if (gitPath) {
 					} else {
 						Container.set("terminal", getTerm);
 						Container.set("git-path", gitPath);
+						Container.set("terminal-size", { width: process.stdout.columns, height: process.stdout.rows });
 						const sc = Container.get(Screen);
 						sc.initStateAndRender();
 					}
