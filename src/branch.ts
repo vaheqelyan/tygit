@@ -91,28 +91,13 @@ class Branches extends List {
 		this.branchPrompt.prompt("Branch name?", "CREATE BRANCH");
 	}
 
-	public deleteBranchHandle(branchName) {
-		// @ts-ignore
-		for (let i = 0; i < this.element.items.length; i++) {
-			// @ts-ignore
-			if (this.element.getItem(this.element.items[i]).getText() === branchName) {
-				// @ts-ignore
-				this.element.removeItem(this.element.getItem(this.element.items[i]));
-			}
-		}
-		this.screen.screen.render();
-	}
-
 	public deleteBranch() {
 		if (this.screen.curElement === "Branches") {
 			const selected = this.getSelected();
 			if (selected) {
 				const branchName = this.getSelectedBranchName();
-				this.gitFactory.deleteBranch(
-					branchName,
-					this.deleteBranchHandle.bind(this, branchName),
-					this.deletePrompt.deleteBranchHandleError,
-				);
+				this.deletePrompt.setBranchName(branchName);
+				this.gitFactory.deleteBranch(branchName, this.deletePrompt.setResponse, this.deletePrompt.onClose);
 			}
 		} else {
 			this.deletePrompt.prompt("Delete branch", "DELETE BRANCH");
