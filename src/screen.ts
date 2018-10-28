@@ -14,8 +14,6 @@ import MSG from "./messages/statusBar";
 import PullInput from "./pullPrompt";
 import PushInput from "./pushPrompt";
 
-import * as size from "window-size";
-
 import { setColumnForStatus, setLeftColumn, setLeftRow, setTopForStatus } from "./fn/layout";
 
 export default class Screen {
@@ -59,6 +57,7 @@ export default class Screen {
 	private terminalSize: { width: number; height: number };
 	constructor(container) {
 		this.terminalEncode = container.get("terminal");
+		this.terminalSize = container.get("terminal-size");
 		this.screen = this.createScreen();
 	}
 
@@ -106,7 +105,6 @@ export default class Screen {
 		this.screen.screen.render();
 	}
 	public createScreen() {
-		this.terminalSize = size;
 		const screen = blessed.screen({
 			autoPadding: true,
 			cursor: {
