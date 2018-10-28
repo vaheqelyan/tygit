@@ -5,6 +5,10 @@ import { exec, ExecException, execFile, spawn } from "child_process";
 
 import * as lupus from "lupus";
 
+type SpawnHandle = (response: Buffer) => void;
+
+type SpawnClose = (code: number) => void;
+
 class Git {
 	public dir: string;
 	private needReReload: boolean;
@@ -97,54 +101,45 @@ class Git {
 		];
 	}
 
-	public commitAllSpawn(message: string, handle: (data: Buffer) => void, onClose: (code: number) => void) {
+	public commitAllSpawn(message: string, handle: SpawnHandle, close: SpawnClose) {
 		const commit = this.gitSpawn(["commit", "-m", `${message}`]);
 		commit.stdout.on("data", handle);
 		commit.stderr.on("data", handle);
-		commit.on("close", onClose);
+		commit.on("close", close);
 	}
 
-	public commit(message: string, handleExec: () => void, handleExecError: (err: string) => void) {
-		this.runCmd(["commit", "-m", `${message}`], err => {
-			if (err) {
-				handleExecError(err.message.toString());
-				return;
-			}
-			handleExec();
-		});
-	}
-
-	public commitFile(message: string, fileName: string, handle: (res: Buffer) => void, close: (code: number) => void) {
+	public commitFile(message: string, fileName: string, handle: SpawnHandle, close: SpawnClose) {
 		const commit = this.gitSpawn(["commit", "-m", `${message}`, fileName]);
 		commit.stdout.on("data", handle);
 		commit.stderr.on("data", handle);
 		commit.on("close", close);
 	}
 
-	public pullNoArgs(handle: (data: Buffer) => void, onClose: (code: any) => void) {
+	public pullNoArgs(handle: SpawnHandle, close: SpawnClose) {
 		const pull = this.gitSpawn(["pull"]);
 		pull.stdout.on("data", handle);
 		pull.stderr.on("data", handle);
-		pull.on("close", onClose);
+		pull.on("close", close);
 	}
-	public pull(value: string, handle: (data: Buffer) => void, onClose: (code: any) => void) {
+
+	public pull(value: string, handle: SpawnHandle, close: SpawnClose) {
 		const pull = this.gitSpawn(["pull", ...value.split(" ")]);
 		pull.stdout.on("data", handle);
 		pull.stderr.on("data", handle);
-		pull.on("close", onClose);
+		pull.on("close", close);
 	}
 
-	public pushNoArgs(handleErr: (res: Buffer) => void, handleClose: (code: number) => void) {
+	public pushNoArgs(handleErr: SpawnHandle, close: SpawnClose) {
 		const { current } = this.branches;
 		const push = this.gitSpawn(["push", "origin", current]);
 		push.stderr.on("data", handleErr);
-		push.on("close", handleClose);
+		push.on("close", close);
 	}
 
-	public push(value: string, handle: (data: Buffer) => void, handleClose: (code: number) => void) {
+	public push(value: string, handle: SpawnHandle, close: SpawnClose) {
 		const push = this.gitSpawn(["push", ...value.split(" ")]);
 		push.stderr.on("data", handle);
-		push.on("close", handleClose);
+		push.on("close", close);
 	}
 	public asyncDiff(cb) {
 		this.async.diff(cb);
@@ -164,7 +159,7 @@ class Git {
 		});
 	}
 
-	public merge(branchName, handle: (res: Buffer) => void, close: (code: number) => void) {
+	public merge(branchName, handle: SpawnHandle, close: SpawnClose) {
 		const merge = this.gitSpawn(["merge", branchName]);
 		merge.stdout.on("data", handle);
 
@@ -172,31 +167,18 @@ class Git {
 		merge.on("close", close);
 	}
 
-	public newBranch(branchName, handle: () => void, handleError: (err: string) => void) {
-		this.runCmd(["checkout", "-b", branchName], err => {
-			if (err) {
-				handleError(err.message.toString());
-				return;
-			}
-
-			this.branches.all.push(branchName);
-			this.branches.current = branchName;
-
-			handle();
-		});
+	public newBranch(branchName, handle: SpawnHandle, close: SpawnClose) {
+		const checkout = this.gitSpawn(["checkout", "-b", branchName]);
+		checkout.stdout.on("data", handle);
+		checkout.stderr.on("data", handle);
+		checkout.on("close", close);
 	}
 
-	public deleteBranch(branchName, handle: () => void, handleError: (err: string) => void) {
-		this.runCmd(["branch", "-D", branchName], err => {
-			if (err) {
-				handleError(err.message.toString());
-				return;
-			}
-
-			this.branches.all.splice(branchName, 1);
-
-			handle();
-		});
+	public deleteBranch(branchName, handle: SpawnHandle, close: SpawnClose) {
+		const del = this.gitSpawn(["branch", "-D", branchName]);
+		del.stdout.on("data", handle);
+		del.stderr.on("data", handle);
+		del.on("close", close);
 	}
 
 	public removeFromStatusMap(item: string) {
