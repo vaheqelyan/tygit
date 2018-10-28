@@ -1,6 +1,9 @@
 const MSG = {
 	COMMITED: "Ok::File/s has been commited",
 	COMMITING: "Wait::Commiting",
+	CREATED_NEW_BRANCH: "Ok::The branch was created",
+	CREATING_NEW_BRANCH: "Wait::Create a new branch",
+	DELETING_BRANCH: "Wait::Delete branch",
 	LOADED: "Ok::Loaded",
 	LOADING: "Wait::Loading...",
 	MERGED: "Ok::Merged",
@@ -12,8 +15,8 @@ const MSG = {
 	PUSHING: "Wait:Pushing...",
 	RELOAD: "Wait::Reloading...",
 	RELOADED: "Ok::Reloaded",
-	RELOAD_STATUS: "Wait::Reloading status...",
-	STATUS_RELOADED: "Ok::Status reloaded",
+	RELOAD_STATUS: "Wait::Update status",
+	STATUS_RELOADED: "Ok::Status, updated",
 	TRACKED: "Ok::File/s has been tracked",
 	TRACKING: "Wait::Tracking files",
 };
