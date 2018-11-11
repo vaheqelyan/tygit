@@ -1,26 +1,35 @@
 import List from "./list";
 
+import { existsSync, readFileSync, writeFileSync } from "fs";
+import { join } from "path";
 import { Inject, Service } from "typedi";
+import Checkout from "./checkout";
 import CommitFileInput from "./commitFilePrompt";
-import Diff from "./diff";
 import buildStatusArray from "./fn/buildStatusArray";
 import Git from "./git";
+import LogWidget from "./log/logWidget";
 import MSG from "./messages/statusBar";
+import Rm from "./rm";
 import StatusBar from "./statusBar";
 
 @Service()
 class Status extends List {
+	@Inject(() => Rm)
+	private rmFactory: Rm;
 	@Inject(() => Git)
-	public gitFactory: Git;
+	private gitFactory: Git;
 
-	@Inject(() => Diff)
-	public diffFactory: Diff;
+	@Inject(() => Checkout)
+	private checkoutFactory: Checkout;
 
 	@Inject(() => StatusBar)
-	public statusBarFactory: StatusBar;
+	private statusBarFactory: StatusBar;
 
 	@Inject(() => CommitFileInput)
-	public commitFilePrompt: CommitFileInput;
+	private commitFilePrompt: CommitFileInput;
+
+	@Inject(() => LogWidget)
+	private logFactory: LogWidget;
 
 	public onEnter() {
 		const selected = this.getSelected();
@@ -56,14 +65,9 @@ class Status extends List {
 				console.log(err);
 			}
 
-			/*
-				I'll process more complex solution 
-				Cleaning after without calling git status --short after each file staging
-				It is a little safe :) WIP
-			*/
 			this.gitFactory.clearUntracked();
 			this.statusBarFactory.toggleContent(MSG.TRACKED);
-			this.screenFactory.reloadFn(true, false);
+			this.screenFactory.updateFactory.updateAfterTrack();
 		});
 		this.statusBarFactory.setTitleAndRender(MSG.TRACKING);
 	}
@@ -89,7 +93,13 @@ class Status extends List {
 	public selectingNext() {
 		const select = this.getSelected();
 		if (select) {
-			this.diffFactory.diffOnFocus();
+			this.logFactory.logOnFocus();
+		} else {
+			// @ts-ignore
+			if (this.getElement().items.length === 0) {
+				this.gitFactory.clearLogs();
+				this.logFactory.emptyList();
+			}
 		}
 	}
 
@@ -102,11 +112,48 @@ class Status extends List {
 		this.element.up();
 	}
 
-	protected onSelect() {
-		this.setStatusBarSelectedTitle();
-		this.diffFactory.diffOnFocus();
+	public checkoutFile() {
+		this.checkoutFactory.checkout();
+	}
+
+	public ignore() {
+		const flag = this.getFlag();
+		if (flag) {
+			if (flag === "??") {
+				const gitIgnoreDir = join(this.gitFactory.dir, ".gitignore");
+				const findIgnore = existsSync(gitIgnoreDir);
+				if (findIgnore) {
+					const ignoreFile = this.getSelectedFileName();
+					const read = readFileSync(gitIgnoreDir, "utf8");
+					writeFileSync(gitIgnoreDir, read + "\n" + ignoreFile, "utf8");
+					this.statusBarFactory.setTitleAndRender(`Ignored ${ignoreFile}`);
+
+					this.commitFilePrompt.setType("COMMIT FILE");
+
+					this.gitFactory.commitFile(
+						`Added ${ignoreFile} to the .gitignore`,
+						".gitignore",
+						this.commitFilePrompt.setSpawnResponse,
+						this.commitFilePrompt.onClose,
+					);
+				}
+			}
+		}
+	}
+
+	public remove(i) {
+		this.element.removeItem(i);
 		this.screenFactory.screen.render();
 	}
+	public rm() {
+		this.rmFactory.rm();
+	}
+
+	protected onSelect = () => {
+		this.setStatusBarSelectedTitle();
+		this.logFactory.logOnFocus();
+		this.screenFactory.screen.render();
+	};
 }
 
 export default Status;
