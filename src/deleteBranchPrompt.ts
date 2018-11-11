@@ -29,7 +29,7 @@ export default class DeleteBranchPrompt extends Prompt {
 				this.branchFactory.getElement().removeItem(elitem);
 			}
 		}
-		this.statusBarFactory.toggleContent(`Ok:: Deleted branch ${branchName}`);
+		this.statusBarFactory.toggleContent(MSG.BRANCH_DELETED);
 		this.screenFactory.screen.render();
 	};
 
