@@ -1,14 +1,14 @@
-import * as blessed from "blessed";
-import { Inject, Service } from "typedi";
+import { Inject } from "typedi";
 import BranchPrompt from "./BranchPrompt";
 import DeleteBranchPrompt from "./DeleteBranchPrompt";
 import Git from "./git";
 import List from "./List";
+import LogWidget from "./log/logWidget";
 import Message from "./message";
 import Screen from "./screen";
 import StatusBar from "./statusBar";
+import SwitchBranch from "./switchBranch";
 
-@Service()
 class Branches extends List {
 	@Inject(() => Screen)
 	public screen: Screen;
@@ -23,51 +23,13 @@ class Branches extends List {
 	public branchPrompt: BranchPrompt;
 	@Inject(() => DeleteBranchPrompt)
 	public deletePrompt: DeleteBranchPrompt;
+	@Inject(() => SwitchBranch)
+	private switchBranchFactory: SwitchBranch;
+	@Inject(() => LogWidget)
+	private logFactory: LogWidget;
 
-	public switchBranchHandle = () => {
-		const selected = this.getSelected();
-		const branchName = selected.getText();
-		// @ts-ignore
-		this.element.items.forEach((value: blessed.Widgets.ListElement, index) => {
-			const t = value.getText();
-			if (t === branchName) {
-				selected.setText(`* ${branchName}`);
-			}
-			if (t.split("*").length > 1) {
-				const getByIndex = this.element.getItemIndex(index);
-				// @ts-ignore
-				this.element.getItem(getByIndex).setText(this.gitFactory.branches.current);
-				this.gitFactory.setCurrentBracnh(branchName);
-			}
-		});
-
-		this.statusBarFactory.toggleContent(`Ok::Switched to branch '${branchName}'`);
-
-		this.enable();
-
-		this.screen.screen.render();
-	};
-	public switchBranchErrorHandle = err => {
-		this.msgFactory.display(err, (errMsg, value) => {
-			if (errMsg) {
-				console.log(errMsg);
-			}
-			if (value) {
-				this.screen.screen.remove(this.msgFactory.element);
-				this.screen.screen.render();
-			}
-		});
-	};
 	public onEnter = () => {
-		const selected = this.getSelected();
-		if (selected) {
-			const branchName = selected.getText();
-			if (branchName.indexOf("*") !== 0) {
-				this.gitFactory.switchBranch(branchName, this.switchBranchHandle, this.switchBranchErrorHandle);
-
-				this.disable();
-			}
-		}
+		this.switchBranchFactory.switch();
 	};
 
 	public reload() {
@@ -103,6 +65,23 @@ class Branches extends List {
 			this.deletePrompt.prompt("Delete branch", "DELETE BRANCH");
 		}
 	}
+
+	public showLogs = () => {
+		const getCurrentB = this.gitFactory.getCurrentBranch();
+		if (!this.gitFactory.branchLogs.has(getCurrentB)) {
+			this.gitFactory.logBranch(() => {
+				this.logFactory.logBranch();
+			});
+		} else {
+			this.logFactory.logBranch();
+		}
+	};
+
+	public jumpToLogs = () => {
+		this.showLogs();
+		this.logFactory.focus();
+		this.screenFactory.screen.render();
+	};
 }
 
 export default Branches;
