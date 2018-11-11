@@ -1,11 +1,10 @@
 import * as blessed from "blessed";
 import { Inject, Service } from "typedi";
+import { setColumnForStatusBar, setRowForStatusBar, STATUS_BAR_HEIGHT } from "./fn/layout";
 import writeStatusBarContent from "./fn/writeStatusBarContent";
 import Git from "./git";
 import MSG from "./messages/statusBar";
 import Screen from "./screen";
-
-import { setColumnForStatusBar, setRowForStatusBar, STATUS_BAR_HEIGHT } from "./fn/layout";
 
 @Service()
 class StatusBar {
@@ -25,7 +24,7 @@ class StatusBar {
 		this.screenFactory.screen.append(this.element);
 		this.screenFactory.screen.render();
 	}
-	public toggleContent(val1: string, val2: string = "", ms: number = 1800) {
+	public toggleContent(val1: MSG, val2: MSG | string = "", ms: number = 1800) {
 		this.setTitleAndRender(val1);
 
 		setTimeout(() => {
@@ -40,7 +39,7 @@ class StatusBar {
 		}
 	}
 
-	public setTitle(title?: string) {
+	public setTitle(title?: MSG | string) {
 		const dS = this.gitFactory.getDiffSummary();
 		if (dS) {
 			const { insertions, deletions } = dS;
@@ -48,7 +47,7 @@ class StatusBar {
 		}
 	}
 
-	public setTitleAndRender(title: string, ren: boolean = true) {
+	public setTitleAndRender(title: MSG | string, ren: boolean = true) {
 		this.setTitle(title);
 		if (ren) {
 			this.screenFactory.screen.render();
