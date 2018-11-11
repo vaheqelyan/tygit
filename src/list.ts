@@ -5,15 +5,15 @@ import Screen from "./screen";
 @Service()
 export default abstract class List {
 	@Inject(() => Screen)
-	public screenFactory: Screen;
+	protected screenFactory: Screen;
 	protected element: blessed.Widgets.ListElement = null;
 
-	public appendToScreen(label, items, width, height, top?: number) {
-		this.makeElement(label, items, width, height, top);
+	public appendToScreen(label, items, width, height, top?: number, left?: number) {
+		this.makeElement(label, items, width, height, top, left);
 		this.screenFactory.screen.append(this.element);
 	}
 
-	public makeElement(label: string, items: string[], width: number, height: number, top?: number) {
+	public makeElement(label: string, items: string[], width: number, height: number, top?: number, left?: number) {
 		this.element = blessed.list({
 			align: "left",
 			border: {
@@ -49,6 +49,7 @@ export default abstract class List {
 			tags: true,
 			top,
 			width,
+			left,
 		});
 		this.element.key("down", this.onDown);
 		this.element.key("up", this.onUp);
@@ -73,7 +74,20 @@ export default abstract class List {
 			const selectedText = selected.getText();
 			return this.parseFileName(selectedText);
 		}
-		return null;
+	}
+
+	public getFlag(): string {
+		const selected = this.getSelected();
+		if (selected) {
+			return selected.getText().split(" ")[1];
+		}
+	}
+
+	public getItemText() {
+		const selected = this.getSelected();
+		if (selected) {
+			return selected.getText();
+		}
 	}
 
 	public getSelectedBranchName(): string {
@@ -86,6 +100,10 @@ export default abstract class List {
 	}
 	public getElement(): blessed.Widgets.ListElement {
 		return this.element;
+	}
+
+	public parseFlag(filename: string) {
+		return filename.split(" ");
 	}
 
 	public parseFileName(fileName: string) {
