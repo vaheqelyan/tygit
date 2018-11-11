@@ -1,6 +1,5 @@
 import * as fuzzysearch from "fuzzysearch";
 import { Inject } from "typedi";
-import Diff from "./diff";
 import Git from "./git";
 import Message from "./message";
 import MSG from "./messages/statusBar";
@@ -18,8 +17,6 @@ class PullInput extends Prompt {
 	public screenFactory: Screen;
 	@Inject(() => StatusBar)
 	public statusBarFactory: StatusBar;
-	@Inject(() => Diff)
-	public diffFactory: Diff;
 	@Inject(() => Message)
 	public msgFactory: Message;
 
@@ -41,14 +38,14 @@ class PullInput extends Prompt {
 			if (fuzzysearch("conflict", this.spawnResponse)) {
 				this.spawnResponse = null;
 				this.statusBarFactory.toggleContent(MSG.PULLED_WITH_CONFLICT);
-				this.screenFactory.reloadFn(true, false);
+				this.screenFactory.updateFactory.reloadStatus();
 			} else {
 				this.screenFactory.alertError(this.spawnResponse);
 			}
 		} else {
 			this.spawnResponse = null;
 			this.statusBarFactory.setTitle(MSG.PULLED);
-			this.screenFactory.reloadFn(true, false);
+			this.screenFactory.updateFactory.reloadStatus();
 		}
 	};
 }
