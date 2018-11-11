@@ -3,21 +3,25 @@ import * as git from "simple-git/promise";
 
 import { exec, ExecException, execFile, spawn } from "child_process";
 
-import * as lupus from "lupus";
+import ExecLog from "./log/log";
 
-type SpawnHandle = (response: Buffer) => void;
+import { Inject } from "typedi";
 
-type SpawnClose = (code: number) => void;
+import { ILog, SpawnClose, SpawnHandle } from "./interfaces/git";
 
 class Git {
 	public dir: string;
+	public logs: Map<string, ILog[]> = new Map();
+
+	public branchLogs: Map<string, ILog[]> = new Map();
 	private needReReload: boolean;
-	private gitStatus: git.StatusResult;
 	private async: SimpleGitAsync.SimpleGitAsync;
 	private branches: git.BranchSummary;
 	private diffSummary: git.DiffResult;
-	private diffs: Map<string, string> = new Map();
 	private gitMapStatus: Map<string, string> = new Map();
+
+	@Inject(() => ExecLog)
+	private logFactory: ExecLog;
 	constructor(container) {
 		this.dir = container.get("git-path");
 		this.async = SimpleGitAsync(this.dir);
@@ -28,36 +32,27 @@ class Git {
 	}
 
 	public clearAfterAllCommit() {
-		this.clearDiffs();
+		this.clearLogs();
 		this.clearStatus();
 	}
 
-	public switchBranch(bName: string, handleExec: () => void, handleExecError: (err: string) => void) {
-		this.runCmd(["checkout", bName], err => {
-			if (err) {
-				handleExecError(err.message.toString());
-				return;
-			}
-			handleExec();
-		});
+	public clearLogs() {
+		this.logs.clear();
 	}
 
-	public isNeedDiff(): boolean {
-		return this.gitStatus.modified.length > 0 || this.gitStatus.conflicted.length > 0;
+	public runExec(cmd, cb) {
+		exec(cmd, { cwd: this.dir }, cb);
 	}
 
-	public startDiffing(observerCallback: (fnam: string) => void) {
-		const keys = Array.from(this.diffs.keys());
-		if (keys.length > 0) {
-			lupus(0, keys.length, n => {
-				const filePath = keys[n];
-				const getFlag = this.gitMapStatus.get(filePath);
-				this.runDiff(getFlag.length > 1 ? "" : "HEAD", filePath, data => {
-					this.diffs.set(filePath, data);
-					observerCallback(filePath);
-				});
-			});
-		}
+	public runExecFile(cmd: string[], cb) {
+		execFile("git", cmd, { cwd: this.dir }, cb);
+	}
+
+	public switchBranch(bName: string, handle: SpawnHandle, close: SpawnClose) {
+		const checkout = this.gitSpawn(["checkout", bName]);
+		checkout.stdout.on("data", handle);
+		checkout.stderr.on("data", handle);
+		checkout.on("close", close);
 	}
 
 	public initBranches(cb: () => void) {
@@ -86,19 +81,6 @@ class Git {
 
 	public track(cb: (err: Error, data: any) => void) {
 		this.async.add("./*", cb);
-	}
-
-	public clearDiffs() {
-		this.diffs.clear();
-	}
-	public getFilesForCommit(): string[] {
-		return [
-			...this.gitStatus.modified,
-			...this.gitStatus.created,
-			...this.gitStatus.renamed,
-			...this.gitStatus.conflicted,
-			...this.gitStatus.deleted,
-		];
 	}
 
 	public commitAllSpawn(message: string, handle: SpawnHandle, close: SpawnClose) {
@@ -140,9 +122,6 @@ class Git {
 		const push = this.gitSpawn(["push", ...value.split(" ")]);
 		push.stderr.on("data", handle);
 		push.on("close", close);
-	}
-	public asyncDiff(cb) {
-		this.async.diff(cb);
 	}
 
 	public status(cb: () => void) {
@@ -216,13 +195,64 @@ class Git {
 		return this.diffSummary;
 	}
 
-	public getDiffs() {
-		return this.diffs;
-	}
-
 	public getStatuMap() {
 		return this.gitMapStatus;
 	}
+
+	public log(filePath, cb: (logs: ILog[], file: string) => void) {
+		this.logFactory.execLogForFile(filePath, (out, fname) => {
+			const output = out;
+			this.logs.set(filePath, this.logFactory.makeMap(output));
+			cb(this.logs.get(filePath), fname);
+		});
+	}
+
+	public logBranch(cb: () => void) {
+		this.logFactory.execLogForBranch(out => {
+			const cur = this.getCurrentBranch();
+			this.branchLogs.set(cur, this.logFactory.makeMap(out));
+			cb();
+		});
+	}
+
+	public checkoutChanges(fName, handle: SpawnHandle, close: SpawnClose) {
+		const checkout = this.gitSpawn(["checkout", "--", fName]);
+		checkout.stdout.on("data", handle);
+
+		checkout.stderr.on("data", handle);
+		checkout.on("close", close);
+	}
+
+	public clearLog(key) {
+		if (this.gitMapStatus.has(key)) {
+			this.logs.delete(key);
+		}
+	}
+
+	public deleteKeyAfterCommit(key) {
+		this.clearLog(key);
+		this.removeFromStatusMap(key);
+	}
+
+	public deleteAllKeys() {
+		this.gitMapStatus.clear();
+		this.logs.clear();
+	}
+
+	public amend(message: string, handle: SpawnHandle, close: SpawnClose) {
+		const amend = this.gitSpawn(["commit", "--amend", "--no-edit", "-m", message.substr(2, message.length)]);
+		amend.stdout.on("data", handle);
+		amend.stderr.on("data", handle);
+		amend.on("close", close);
+	}
+	public rm(file: string, handle: SpawnHandle, close: SpawnClose) {
+		const rm = this.gitSpawn(["rm", "--cached", file]);
+
+		rm.stdout.on("data", handle);
+		rm.stderr.on("data", handle);
+		rm.on("close", close);
+	}
+
 	private gitSpawn(cmd: string[]) {
 		return spawn("git", cmd, { cwd: this.dir });
 	}
@@ -230,19 +260,6 @@ class Git {
 		execFile("git", cmd, { cwd: this.dir }, cb);
 	}
 
-	private runDiff(isHead: string, filePath: string, cb: (data: string) => void) {
-		exec(
-			`git diff --color ${isHead} ${filePath} | sed -r "s/^([^-+ ]*)[-+ ]/\\1/" | less -r`,
-			{ cwd: this.dir },
-			(err, data) => {
-				if (err) {
-					console.log(err);
-					return;
-				}
-				cb(data);
-			},
-		);
-	}
 	private parseStatus(str: string) {
 		const toLines = str.split("\n");
 		toLines.pop();
@@ -251,17 +268,8 @@ class Git {
 			const flag: string = s[0];
 			const path = s[1];
 
-			if (flag !== "A" && flag !== "D" && flag !== "DD" && flag !== "??" && flag !== "AD") {
-				this.diffs.set(path, "");
-			}
-
-			if (flag.length > 1) {
-				this.needReReload = true;
-			}
-
 			this.gitMapStatus.set(path, flag);
 		}
 	}
 }
-
 export default Git;
