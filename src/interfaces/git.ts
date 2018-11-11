@@ -6,4 +6,3 @@ export interface ILog {
 export type SpawnHandle = (response: Buffer) => void;
 
 export type SpawnClose = (code: number) => void;
-
