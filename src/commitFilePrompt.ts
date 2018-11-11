@@ -1,5 +1,4 @@
 import { Inject } from "typedi";
-import Diff from "./diff";
 import Git from "./git";
 import Prompt from "./prompt";
 import Screen from "./screen";
@@ -7,6 +6,8 @@ import Status from "./status";
 import StatusBar from "./statusBar";
 
 import MSG from "./messages/statusBar";
+
+import Amend from "./amend";
 
 class CommitFileInput extends Prompt {
 	@Inject(() => Git)
@@ -17,74 +18,50 @@ class CommitFileInput extends Prompt {
 	public screenFactory: Screen;
 	@Inject(() => StatusBar)
 	public statusBarFactory: StatusBar;
-	@Inject(() => Diff)
-	public diffFactory: Diff;
-	private fileName: string;
+	@Inject(() => Amend)
+	private amendFactory: Amend;
 
 	private spawnResponse: string;
 
-	public handle = () => {
-		const { fileName } = this;
-		this.statusBarFactory.setTitleAndRender(MSG.COMMITED);
-
-		this.gitFactory.initDiffSummary(() => {
-			this.statusBarFactory.toggleContent(MSG.COMMITED);
-		});
-
-		this.statusFactory.getElement().removeItem(this.statusFactory.getSelected());
-		const diffs = this.gitFactory.getDiffs();
-		if (diffs.has(fileName)) {
-			this.diffFactory.element.setContent(" ");
-			diffs.delete(fileName);
-		}
-		this.gitFactory.removeFromStatusMap(fileName);
-		this.statusFactory.selectingNext();
-		this.screenFactory.screen.render();
-	};
-
-	public handleCommitAll = () => {
-		this.statusBarFactory.setTitleAndRender(MSG.COMMITED);
-		this.gitFactory.initDiffSummary(() => {
-			this.statusBarFactory.resetContent();
-		});
-
-		this.statusFactory.clearAfterCommit();
-		this.diffFactory.element.setContent("");
-
-		this.gitFactory.clearAfterAllCommit();
-
-		this.screenFactory.screen.render();
-	};
+	public checkForAmend(str: string) {
+		const sym = str.substr(0, 2);
+		return sym === "a ";
+	}
 
 	public onSubmit(value) {
-		this.spawnResponse = null;
-		if (this.type === "COMMIT FILE") {
-			const fileName = this.statusFactory.getSelectedFileName();
-			this.fileName = fileName;
-			this.gitFactory.commitFile(value, fileName, this.setSpawnResponse, this.onClose);
-		} else if (this.type === "COMMIT") {
-			this.gitFactory.commitAllSpawn(value, this.setSpawnResponse, this.onClose);
-		}
+		if (this.checkForAmend(value)) {
+			this.amendFactory.amend(value);
+		} else {
+			this.spawnResponse = null;
+			if (this.type === "COMMIT FILE") {
+				const fileName = this.statusFactory.getSelectedFileName();
+				this.gitFactory.commitFile(value, fileName, this.setSpawnResponse, this.onClose);
+			} else if (this.type === "COMMIT") {
+				this.gitFactory.commitAllSpawn(value, this.setSpawnResponse, this.onClose);
+			}
 
-		this.statusBarFactory.setTitleAndRender(MSG.COMMITING, false);
+			this.statusBarFactory.setTitleAndRender(MSG.COMMITING, false);
+		}
 
 		this.screen.screen.remove(this.element);
 		this.screen.screen.render();
 	}
 
-	private onClose = code => {
+	public onClose = code => {
 		if (code !== 0) {
 			this.screenFactory.alertError(this.spawnResponse);
 		} else {
+			this.statusBarFactory.toggleContent(MSG.COMMITED);
+
 			if (this.type === "COMMIT FILE") {
-				this.handle();
+				this.screenFactory.updateFactory.updateAfterSingleCommit();
 			} else if (this.type === "COMMIT") {
-				this.handleCommitAll();
+				this.screenFactory.updateFactory.updateAfterCommit();
 			}
 		}
 	};
 
-	private setSpawnResponse = (response: Buffer) => {
+	public setSpawnResponse = (response: Buffer) => {
 		this.spawnResponse = response.toString();
 	};
 }
