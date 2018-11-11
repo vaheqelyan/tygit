@@ -65,13 +65,15 @@ class Git {
 		});
 	}
 
-	public initDiffSummary(cb: () => void) {
+	public initDiffSummary(cb?: () => void) {
 		this.async.diffSummary((err, data) => {
 			if (err) {
 				console.error(err);
 			}
 			this.diffSummary = data;
-			cb();
+			if (cb) {
+				cb();
+			}
 		});
 	}
 
