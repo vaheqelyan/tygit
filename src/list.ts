@@ -23,8 +23,9 @@ export default abstract class List {
 			invertSelected: false,
 			items,
 			label,
+			left,
 			mouse: true,
-			scrollbar: {
+			scrollbar:{
 				ch: "",
 				style: {
 					inverse: true,
@@ -49,7 +50,6 @@ export default abstract class List {
 			tags: true,
 			top,
 			width,
-			left,
 		});
 		this.element.key("down", this.onDown);
 		this.element.key("up", this.onUp);
