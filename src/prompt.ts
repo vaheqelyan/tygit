@@ -5,10 +5,9 @@ import Screen from "./screen";
 type PromptPurpose = "COMMIT" | "COMMIT FILE" | "PUSH" | "PULL" | "DELETE BRANCH" | "CREATE BRANCH" | "MERGE";
 
 abstract class Prompt {
-	public element: blessed.Widgets.TextboxElement;
-
 	@Inject(() => Screen)
 	public screen: Screen;
+	protected element: blessed.Widgets.TextboxElement;
 	protected type: PromptPurpose;
 
 	public prompt(label, type: PromptPurpose) {
@@ -17,6 +16,14 @@ abstract class Prompt {
 		this.screen.screen.append(this.element);
 		this.element.focus();
 		this.screen.screen.render();
+	}
+
+	public setType(type: PromptPurpose) {
+		this.type = type;
+	}
+
+	public getElement(): blessed.Widgets.TextboxElement {
+		return this.element;
 	}
 	protected makePrompt(label) {
 		this.element = blessed.textbox({
