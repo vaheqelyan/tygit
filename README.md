@@ -31,7 +31,7 @@ tygit ../git-repo
 - [ ] Better message output
 - [ ] Handling, validating commit messages
 - [ ] Responsive layout when resizing
-- [ ] Make the log more readable (truncate, shorten)
+- [ ] Make the log more readable (truncate, shorten, file names)
 See the [Cheat Sheet](https://github.com/vaheqelyan/tygit/blob/master/CHEAT_SHEET.md)
 
 ---
