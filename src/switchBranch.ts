@@ -3,9 +3,9 @@ import { Inject } from "typedi";
 
 import Branches from "./branch";
 import Git from "./git";
+import MSG from "./messages/statusBar";
 import Screen from "./screen";
 import StatusBar from "./statusBar";
-
 class SwitchBranch {
 	@Inject(() => Git)
 	public gitFactory: Git;
@@ -54,7 +54,7 @@ class SwitchBranch {
 			}
 		});
 
-		this.statusBarFactory.toggleContent(`Ok::Switched to branch '${branchName}'`);
+		this.statusBarFactory.toggleContent(MSG.SWITCHED_BRANCH);
 
 		this.brancFactory.enable();
 		this.screenFactory.updateFactory.reloadStatus();
