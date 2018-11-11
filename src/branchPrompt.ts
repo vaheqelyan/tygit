@@ -30,7 +30,7 @@ class BranchPrompt extends Prompt {
 		if (code !== 0) {
 			this.screenFactory.alertError(this.spanwResponse);
 		} else {
-			this.screenFactory.reload();
+			this.screenFactory.updateFactory.updateAll();
 		}
 	};
 }
