@@ -23,6 +23,6 @@ export default function preFn(gitPath: string, { terminal }: ICliOptions) {
 			console.log("This is not a git repository");
 		}
 	} else {
-		console.log("The path is not correct");
+		console.log("Wrong path");
 	}
 }

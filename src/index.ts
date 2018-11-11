@@ -13,8 +13,7 @@ if (argv.version) {
 if (argv.help) {
 	console.log(`
 	--version, -v  - Current version
-	--terminal - Set the encode for the terminal
-	--help - To get the help
+	--terminal - Set the encoding for the terminal
 	`);
 	process.exit();
 }
@@ -22,5 +21,5 @@ if (argv.help) {
 if (gitPath) {
 	preFn(gitPath, argv);
 } else {
-	console.log("Please, choose git repository path");
+	console.log("Please select git repository path");
 }
