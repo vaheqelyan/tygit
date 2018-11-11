@@ -1,5 +1,5 @@
 // WIll make enum late
-const MSG = {
+enum MSG {
 	AMEND = "Wait::Changing the last commit",
 	AMEND_DONE = "Ok::Changed the last commit",
 	COMMITED = "Ok::File/s has been commited",
@@ -8,12 +8,14 @@ const MSG = {
 	CREATED_NEW_BRANCH = "Ok::The branch was created",
 	CREATING_NEW_BRANCH = "Wait::Create a new branch",
 	DELETING_BRANCH = "Wait::Delete branch",
+	BRANCH_DELETED = "Ok::Branch deleted",
 	LOADED = "Ok::Loaded",
 	LOADING = "Wait::Loading...",
 	MERGED = "Ok::Merged",
 	MERGING = "Wait:Merging branch",
 	PULLED = "Ok::Pulled",
 	PULLED_WITH_CONFLICT = "Ok::Pulled, you have conflicts",
+	SWITCHED_BRANCH = "Ok::Switched to branch",
 	PULLING = "Wait::Pulling...",
 	PUSHED = "Ok::Pushed",
 	PUSHING = "Wait:Pushing...",
