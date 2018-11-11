@@ -1,46 +1,32 @@
-Screenshots of the terminal. Let me know how it works in other terminals
-
 **Open the issue and send a screenshot**
 
 > You can set encode for terminal
 
-```code 
-tygit ../sample --terminal linux 
+```code
+tygit ../sample --terminal linux
 ```
 
-### cmd
+- [x] cmd
+- [x] ConEmu
+- [ ] Git BASH
+- [ ] PowerShell
+- [ ] Hyper
+- [x] Cmder
 
-![](https://res.cloudinary.com/dmtrk3yns/image/upload/q_auto:best/v1539850979/tygit_terminal_support/ice_screenshot_20181017-185504.jpg)
-
----
-
-### ConEmu
-
-![](https://res.cloudinary.com/dmtrk3yns/image/upload/q_auto:best/v1539850963/tygit_terminal_support/ice_screenshot_20181017-190716.jpg)
-
----
-
-### Git BASH
-
-![](https://res.cloudinary.com/dmtrk3yns/image/upload/q_auto:best/v1539850963/tygit_terminal_support/ice_screenshot_20181017-190411.jpg)
-
-> Unfortunately you can't use in git bash.I need to get the size of the terminal so I can correctly perform calculations to draw layout. Because the cygwin shell isn't really a tty, it's a pipe, and i can't get columns and rows.
+### Notes
 
 ---
 
-### PowerShell
+#### Git BASH / cygwin
 
-![](https://res.cloudinary.com/dmtrk3yns/image/upload/q_auto:best/v1539850964/tygit_terminal_support/ice_screenshot_20181017-191244.jpg)
-> Displays different colors
+Unfortunately you can't use in git bash.I need to get the size of the terminal so I can correctly perform calculations to draw layout. Because the cygwin shell isn't really a tty, it's a pipe, and i can't get columns and rows.
 
----
+#### PowerShell
 
-### Hyper
+Displays different colors
 
-![](https://res.cloudinary.com/dmtrk3yns/image/upload/q_auto:best/v1539850965/tygit_terminal_support/ice_screenshot_20181017-191917.jpg)
+![](https://res.cloudinary.com/dmtrk3yns/image/upload/q_auto/v1541940384/tygit_terminal_support/powershell_colors_issue.jpg)
 
-> Looks nice, but **very slow** and I don't know why.
+#### Hyper
 
-### Cmder
-
-![](https://res.cloudinary.com/dmtrk3yns/image/upload/q_auto:best/v1539851866/ice_screenshot_20181018-123319_cmder_bfwhi7.jpg)
+In hyper everything looks beautiful and beautiful, but works **very slowly** and I do not know why.
