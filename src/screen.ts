@@ -3,56 +3,57 @@ import { Inject } from "typedi";
 import Status from "./status";
 
 import Branches from "./branch";
-import Diff from "./diff";
 import Git from "./git";
+import LogWidget from "./log/logWidget";
 import StatusBar from "./statusBar";
 
-import * as fuzzysearch from "fuzzysearch";
 import MergePrompt from "./mergePrompt";
 import Message from "./message";
-import MSG from "./messages/statusBar";
-import PullInput from "./pullPrompt";
-import PushInput from "./pushPrompt";
 
-import { setColumnForStatus, setLeftColumn, setLeftRow, setTopForStatus } from "./fn/layout";
+import Pull from "./pull";
+
+import Push from "./push";
+
+import Update from "./update";
+
+import {
+	setColumnForDiff,
+	setColumnForStatus,
+	setDiffRowPosition,
+	setLeftColumn,
+	setLeftRow,
+	setRowForDiff,
+	setTopForStatus,
+} from "./fn/layout";
 
 export default class Screen {
-	public CtrlPPress = new Date();
-
-	public PPress = new Date();
-
-	public pushDeb = false;
-	public diffTime = 0;
-
 	@Inject() public gitFactory: Git;
-	@Inject(() => Branches)
-	public branchFactory: Branches;
-
-	@Inject(() => MergePrompt)
-	public mergePrompt: MergePrompt;
-
-	@Inject() public statusFactory: Status;
-
-	@Inject() public statusBarFactory: StatusBar;
-	@Inject(() => Diff)
-	public diffFactory: Diff;
 	public screen: blessed.Widgets.Screen;
 
-	@Inject() public pullInput: PullInput;
+	public curElement: string | "Status" | "Diff" | "Branches";
+	@Inject(() => Update)
+	public updateFactory: Update;
+	@Inject(() => Branches)
+	private branchFactory: Branches;
 
-	@Inject() public pushInput: PushInput;
+	@Inject(() => MergePrompt)
+	private mergePrompt: MergePrompt;
 
-	public times: number = 0;
+	@Inject() private statusFactory: Status;
+
+	@Inject() private statusBarFactory: StatusBar;
+	@Inject(() => LogWidget)
+	private logWidgetFactory: LogWidget;
 
 	@Inject(() => Message)
-	public msgFactory: Message;
+	private msgFactory: Message;
 
-	public curElement: string | "Status" | "Diff" | "Branches";
+	@Inject() private pushFactory: Push;
+
+	@Inject(() => Pull)
+	private pullFactory: Pull;
 
 	private terminalEncode: string;
-	private pullSpawnResponse: string;
-
-	private pushSpawnResponse: string;
 
 	private terminalSize: { width: number; height: number };
 	constructor(container) {
@@ -83,7 +84,14 @@ export default class Screen {
 			setColumnForStatus(height),
 			setTopForStatus(height),
 		);
-		this.diffFactory.appendToScreen();
+		this.logWidgetFactory.appendToScreen(
+			"Log",
+			[],
+			setRowForDiff(width),
+			setColumnForDiff(height),
+			0,
+			setDiffRowPosition(width),
+		);
 		this.statusBarFactory.appendToScreen();
 
 		this.gitFactory.initBranches(() => {
@@ -92,7 +100,6 @@ export default class Screen {
 
 		this.gitFactory.status(() => {
 			this.statusFactory.reload();
-			this.gitFactory.startDiffing(this.diffFactory.observerForMap);
 		});
 
 		this.gitFactory.initDiffSummary(() => {
@@ -117,7 +124,6 @@ export default class Screen {
 			dockBorders: true,
 			fastCSR: true,
 			resizeTimeout: 300,
-			title: "widget test",
 			warnings: false,
 		});
 
@@ -144,26 +150,41 @@ export default class Screen {
 		});
 		return screen;
 	}
+
 	public applyEvents() {
+		const statusElement = this.statusFactory.getElement();
+
 		this.screen.on("element focus", this.onFocus.bind(this));
 		this.screen.on("keypress", this.onKeyPress.bind(this));
-		this.screen.key("C-r", this.reload);
+		this.screen.key("C-l", () => {
+			this.branchFactory.jumpToLogs();
+		});
+		this.logWidgetFactory.getElement().key("C-r", () => this.logWidgetFactory.reload());
+		this.screen.key("C-r", () => this.updateFactory.updateAll);
 		this.screen.key("C-c", () => {
 			this.statusFactory.commit();
 		}); // Commit
+		statusElement.key("r", () => this.statusFactory.rm());
 		this.screen.key("m", this.merge);
 		this.screen.key("C-b", () => {
 			this.branchFactory.createNewBranch();
 		});
+		statusElement.key("C-r", () => this.updateFactory.reloadStatus());
 		this.screen.key("C-d", () => {
 			this.branchFactory.deleteBranch();
 		});
 		this.screen.key("C-a", () => {
 			this.statusFactory.trackFiles();
 		}); // Track files
-		this.screen.key("C-p", this.ctrlPKey); // Pull
-		this.screen.key("p", this.pushKey); // Push
-
+		statusElement.key("left", () => {
+			this.statusFactory.checkoutFile();
+		});
+		this.screen.key("C-p", this.pullFactory.bindKey); // Pull
+		this.screen.key("p", this.pushFactory.bindKey); // Push
+		statusElement.free();
+		statusElement.key("i", () => {
+			this.statusFactory.ignore();
+		});
 		this.screen.key(["q", "escape"], this.exit);
 	}
 
@@ -180,17 +201,12 @@ export default class Screen {
 			const { label } = cur.options;
 			this.curElement = label;
 			cur.style.border.bold = true;
-			if (label === "Diff") {
-				// @ts-ignore
-				// Parsing tags using helper
-				// Because tags are disabled for Widget-widget
-				cur.setLabel(blessed.parseTags(`{bold}Diff{/bold}`));
-			} else {
-				cur.setLabel(`{bold}${label}{/bold}`);
-			}
 			if (label === "Status") {
 				this.statusFactory.setStatusBarSelectedTitle();
-				this.diffFactory.diffOnFocus();
+				this.logWidgetFactory.logOnFocus();
+			}
+			if (label === "Log") {
+				this.logWidgetFactory.setStatusBarOnFocus();
 			}
 			this.screen.render();
 		}
@@ -201,39 +217,7 @@ export default class Screen {
 			return key.shift ? this.screen.focusPrevious() : this.screen.focusNext();
 		}
 	}
-	public ctrlPKey = () => {
-		const n = new Date();
-		const differenceTravel = n.getTime() - this.CtrlPPress.getTime();
-		this.diffTime = differenceTravel;
-		setTimeout(() => {
-			if (this.diffTime <= 200) {
-				if (this.pushDeb) {
-					this.pullInput.prompt("Pull", "PULL");
-				}
-				this.pushDeb = !this.pushDeb;
-			} else {
-				this.pull();
-			}
-		}, 500);
-		this.CtrlPPress = n;
-	};
 
-	public pushKey = () => {
-		const n = new Date();
-		const differenceTravel = n.getTime() - this.PPress.getTime();
-		this.diffTime = differenceTravel;
-		setTimeout(() => {
-			if (this.diffTime <= 200) {
-				if (this.pushDeb) {
-					this.pushInput.prompt("Push", "PUSH");
-				}
-				this.pushDeb = !this.pushDeb;
-			} else {
-				this.push();
-			}
-		}, 500);
-		this.PPress = n;
-	};
 	public alertError(err: string) {
 		this.statusBarFactory.resetContent();
 		this.msgFactory.display(err.trim(), (msgErr, value) => {
@@ -242,89 +226,13 @@ export default class Screen {
 			}
 			if (value) {
 				this.screen.remove(this.msgFactory.element);
+				this.screen.focusNext();
 				this.screen.render();
 			}
 		});
 	}
-	public push() {
-		this.pushSpawnResponse = null;
-		this.gitFactory.pushNoArgs(this.stdErrHandle, this.handlePushClose);
-		this.statusBarFactory.setTitleAndRender(MSG.PUSHING);
-	}
-	public pull() {
-		this.pullSpawnResponse = null;
-
-		this.statusBarFactory.setTitleAndRender(MSG.PULLING);
-		this.gitFactory.pullNoArgs(this.handlePull, this.handlePullClose);
-	}
-
-	public reloadFn = (forceStatus: boolean = false, showTitle: boolean = true) => {
-		if (this.curElement === "Status" || forceStatus) {
-			if (showTitle) {
-				this.statusBarFactory.setTitleAndRender(MSG.RELOAD);
-			}
-			this.gitFactory.status(() => {
-				this.statusFactory.reload(false);
-				this.gitFactory.startDiffing(this.diffFactory.observerForMap);
-				this.screen.render();
-			});
-
-			this.gitFactory.initDiffSummary(() => {
-				if (showTitle) {
-					this.statusBarFactory.reload();
-				}
-				this.screen.render();
-			});
-		} else {
-			this.statusBarFactory.setTitleAndRender(MSG.RELOAD);
-			this.gitFactory.initBranches(() => {
-				this.branchFactory.reload();
-				this.screen.render();
-			});
-			this.gitFactory.status(() => {
-				this.statusFactory.reload();
-				this.gitFactory.startDiffing(this.diffFactory.observerForMap);
-				this.screen.render();
-			});
-			this.gitFactory.initDiffSummary(() => {
-				this.statusBarFactory.reload();
-				this.screen.render();
-			});
-		}
-	};
-
-	public reload = () => {
-		this.reloadFn();
-	};
 
 	public merge = () => {
 		this.mergePrompt.prompt("Merging with branch", "MERGE");
-	};
-	private stdErrHandle = (data: Buffer) => {
-		this.pushSpawnResponse = data.toString();
-	};
-
-	private handlePushClose = code => {
-		if (code !== 0) {
-			this.alertError(this.pushSpawnResponse);
-		} else {
-			this.statusBarFactory.toggleContent(MSG.PUSHED);
-		}
-	};
-	private handlePullClose = code => {
-		if (code !== 0) {
-			if (fuzzysearch("conflict", this.pullSpawnResponse)) {
-				this.statusBarFactory.toggleContent(MSG.PULLED_WITH_CONFLICT);
-				this.reloadFn(true, false);
-			} else {
-				this.alertError(this.pullSpawnResponse);
-			}
-		} else {
-			this.statusBarFactory.setTitle(MSG.PULLED);
-			this.reloadFn(true, false);
-		}
-	};
-	private handlePull = (data: Buffer) => {
-		this.pullSpawnResponse = data.toString();
 	};
 }
