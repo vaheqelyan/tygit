@@ -32,7 +32,7 @@ class Update {
 	}
 
 	public uDiffSummary() {
-		this.gitFactory.initDiffSummary(() => {});
+		this.gitFactory.initDiffSummary();
 	}
 
 	public uLog() {
