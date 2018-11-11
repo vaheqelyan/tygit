@@ -31,6 +31,8 @@ class Status extends List {
 	@Inject(() => LogWidget)
 	private logFactory: LogWidget;
 
+	private timeoutId: NodeJS.Timer;
+
 	public onEnter() {
 		const selected = this.getSelected();
 		if (selected) {
@@ -150,6 +152,11 @@ class Status extends List {
 	}
 
 	protected onSelect = () => {
+		clearTimeout(this.timeoutId);
+		this.timeoutId = setTimeout(this.debounceSelect, 500);
+	};
+
+	private debounceSelect = () => {
 		this.setStatusBarSelectedTitle();
 		this.logFactory.logOnFocus();
 		this.screenFactory.screen.render();
