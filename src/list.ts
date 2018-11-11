@@ -25,7 +25,7 @@ export default abstract class List {
 			label,
 			left,
 			mouse: true,
-			scrollbar:{
+			scrollbar: {
 				ch: "",
 				style: {
 					inverse: true,
