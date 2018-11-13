@@ -30,7 +30,7 @@ export default class Screen {
 	@Inject() public gitFactory: Git;
 	public screen: blessed.Widgets.Screen;
 
-	public curElement: string | "Status" | "Diff" | "Branches";
+	public curElement: "Status" | "Log" | "Branches";
 	@Inject(() => Update)
 	public updateFactory: Update;
 	@Inject(() => Branches)
@@ -199,7 +199,7 @@ export default class Screen {
 		}
 		if (cur.border) {
 			const { label } = cur.options;
-			this.curElement = label;
+			this.curElement = label as any;
 			cur.style.border.bold = true;
 			if (label === "Status") {
 				this.statusFactory.setStatusBarSelectedTitle();
