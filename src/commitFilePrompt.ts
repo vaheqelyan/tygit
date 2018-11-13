@@ -11,13 +11,11 @@ import Amend from "./amend";
 
 class CommitFileInput extends Prompt {
 	@Inject(() => Git)
-	public gitFactory: Git;
+	private gitFactory: Git;
 	@Inject(() => Status)
-	public statusFactory: Status;
-	@Inject(() => Screen)
-	public screenFactory: Screen;
+	private statusFactory: Status;
 	@Inject(() => StatusBar)
-	public statusBarFactory: StatusBar;
+	private statusBarFactory: StatusBar;
 	@Inject(() => Amend)
 	private amendFactory: Amend;
 
@@ -43,8 +41,8 @@ class CommitFileInput extends Prompt {
 			this.statusBarFactory.setTitleAndRender(MSG.COMMITING, false);
 		}
 
-		this.screen.screen.remove(this.element);
-		this.screen.screen.render();
+		this.screenFactory.screen.remove(this.element);
+		this.screenFactory.screen.render();
 	}
 
 	public onClose = code => {

@@ -6,16 +6,16 @@ type PromptPurpose = "COMMIT" | "COMMIT FILE" | "PUSH" | "PULL" | "DELETE BRANCH
 
 abstract class Prompt {
 	@Inject(() => Screen)
-	public screen: Screen;
+	protected screenFactory: Screen;
 	protected element: blessed.Widgets.TextboxElement;
 	protected type: PromptPurpose;
 
 	public prompt(label, type: PromptPurpose) {
 		this.type = type;
 		this.makePrompt(label);
-		this.screen.screen.append(this.element);
+		this.screenFactory.screen.append(this.element);
 		this.element.focus();
-		this.screen.screen.render();
+		this.screenFactory.screen.render();
 	}
 
 	public setType(type: PromptPurpose) {
@@ -59,8 +59,8 @@ abstract class Prompt {
 	}
 	protected abstract onSubmit(value: string): void;
 	private onCancel() {
-		this.screen.screen.remove(this.element);
-		this.screen.screen.render();
+		this.screenFactory.screen.remove(this.element);
+		this.screenFactory.screen.render();
 	}
 }
 

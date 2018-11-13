@@ -5,9 +5,12 @@ import Screen from "./screen";
 @Service()
 class Message {
 	@Inject(() => Screen)
-	public screenFactory: Screen;
-	public element: blessed.Widgets.QuestionElement;
+	private screenFactory: Screen;
+	private element: blessed.Widgets.QuestionElement;
 
+	public getElement() {
+		return this.element;
+	}
 	// cb?: (err: any, value: boolean) => void
 	public display(msg: string, cb?: (err: any, value: boolean | string) => void) {
 		this.element = blessed.question({

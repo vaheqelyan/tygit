@@ -1,4 +1,3 @@
-import * as copy from "copy-paste";
 import { Inject, Service } from "typedi";
 import Git from "../git";
 import { ILog } from "../interfaces/git";
@@ -7,6 +6,8 @@ import MSG from "../messages/statusBar";
 import Status from "../status";
 import StatusBar from "../statusBar";
 import Log from "./log";
+
+import * as copy from "clipboardy";
 
 @Service()
 export default class LogWidget extends List {
@@ -35,9 +36,8 @@ export default class LogWidget extends List {
 		} else {
 			getHash = this.logFactory.getHashFromLogMap();
 		}
-		copy.copy(getHash, () => {
-			this.statusBarFactory.toggleContent(MSG.COPIED);
-		});
+		copy.write(getHash);
+		this.statusBarFactory.toggleContent(MSG.COPIED);
 	};
 
 	public emptyList() {

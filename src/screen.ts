@@ -225,7 +225,7 @@ export default class Screen {
 				console.log(msgErr);
 			}
 			if (value) {
-				this.screen.remove(this.msgFactory.element);
+				this.screen.remove(this.msgFactory.getElement());
 				this.screen.focusNext();
 				this.screen.render();
 			}

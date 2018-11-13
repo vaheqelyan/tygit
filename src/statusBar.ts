@@ -8,12 +8,12 @@ import Screen from "./screen";
 
 @Service()
 class StatusBar {
-	public element: blessed.Widgets.BoxElement;
+	private element: blessed.Widgets.BoxElement;
 	@Inject(() => Git)
-	public gitFactory: Git;
+	private gitFactory: Git;
 
 	@Inject(() => Screen)
-	public screenFactory: Screen;
+	private screenFactory: Screen;
 
 	public getElement() {
 		return this.element;

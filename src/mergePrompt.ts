@@ -8,8 +8,6 @@ import StatusBar from "./statusBar";
 class MergePrompt extends Prompt {
 	@Inject(() => Git)
 	private gitFactory: Git;
-	@Inject(() => Screen)
-	private screenFactory: Screen;
 	@Inject(() => StatusBar)
 	private statusBarFactory: StatusBar;
 

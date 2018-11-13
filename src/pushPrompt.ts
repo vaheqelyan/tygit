@@ -6,12 +6,10 @@ import Screen from "./screen";
 import StatusBar from "./statusBar";
 
 class PushInput extends Prompt {
-	@Inject(() => Screen)
-	public screenFactory: Screen;
 	@Inject(() => StatusBar)
-	public statusBarFactory: StatusBar;
+	private statusBarFactory: StatusBar;
 	@Inject(() => Git)
-	public gitFactory: Git;
+	private gitFactory: Git;
 	private spawnResponse: string;
 	public onSubmit(value) {
 		this.spawnResponse = null;

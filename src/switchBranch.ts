@@ -6,9 +6,10 @@ import Git from "./git";
 import MSG from "./messages/statusBar";
 import Screen from "./screen";
 import StatusBar from "./statusBar";
+
 class SwitchBranch {
 	@Inject(() => Git)
-	public gitFactory: Git;
+	private gitFactory: Git;
 	@Inject(() => Screen)
 	private screenFactory: Screen;
 	@Inject() private statusBarFactory: StatusBar;

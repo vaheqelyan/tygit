@@ -1,5 +1,5 @@
 abstract class Key {
-	public keyDeb: boolean = false;
+	private keyDeb: boolean = false;
 	private keyTime: Date = new Date();
 	private diffTime: number = 0;
 

@@ -11,18 +11,18 @@ import SwitchBranch from "./switchBranch";
 
 class Branches extends List {
 	@Inject(() => Screen)
-	public screen: Screen;
+	private screen: Screen;
 	@Inject(() => Git)
-	public gitFactory: Git;
+	private gitFactory: Git;
 	@Inject(() => StatusBar)
-	public statusBarFactory: StatusBar;
+	private statusBarFactory: StatusBar;
 
 	@Inject(() => Message)
-	public msgFactory: Message;
+	private msgFactory: Message;
 	@Inject(() => BranchPrompt)
-	public branchPrompt: BranchPrompt;
+	private branchPrompt: BranchPrompt;
 	@Inject(() => DeleteBranchPrompt)
-	public deletePrompt: DeleteBranchPrompt;
+	private deletePrompt: DeleteBranchPrompt;
 	@Inject(() => SwitchBranch)
 	private switchBranchFactory: SwitchBranch;
 	@Inject(() => LogWidget)

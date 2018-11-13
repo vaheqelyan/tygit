@@ -10,15 +10,13 @@ import StatusBar from "./statusBar";
 
 class PullInput extends Prompt {
 	@Inject(() => Git)
-	public gitFactory: Git;
+	private gitFactory: Git;
 	@Inject(() => Status)
-	public statusFactory: Status;
-	@Inject(() => Screen)
-	public screenFactory: Screen;
+	private statusFactory: Status;
 	@Inject(() => StatusBar)
-	public statusBarFactory: StatusBar;
+	private statusBarFactory: StatusBar;
 	@Inject(() => Message)
-	public msgFactory: Message;
+	private msgFactory: Message;
 
 	private spawnResponse: string;
 
@@ -29,8 +27,8 @@ class PullInput extends Prompt {
 	public onSubmit(value) {
 		this.gitFactory.pull(value, this.handlePull, this.onClose);
 		this.statusBarFactory.setTitleAndRender(MSG.PULLING, false);
-		this.screen.screen.remove(this.element);
-		this.screen.screen.render();
+		this.screenFactory.screen.remove(this.element);
+		this.screenFactory.screen.render();
 	}
 
 	private onClose = code => {

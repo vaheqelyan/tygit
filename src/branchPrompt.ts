@@ -9,9 +9,7 @@ import MSG from "./messages/statusBar";
 @Service()
 class BranchPrompt extends Prompt {
 	@Inject(() => Git)
-	public gitFactory: Git;
-	@Inject(() => Screen)
-	public screenFactory: Screen;
+	private gitFactory: Git;
 	@Inject() private statusBarFactory: StatusBar;
 	private spanwResponse: string;
 

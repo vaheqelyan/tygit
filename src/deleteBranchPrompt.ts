@@ -8,13 +8,11 @@ import StatusBar from "./statusBar";
 
 export default class DeleteBranchPrompt extends Prompt {
 	@Inject(() => Git)
-	public gitFactory: Git;
-	@Inject(() => Screen)
-	public screenFactory: Screen;
+	private gitFactory: Git;
 	@Inject(() => Branches)
-	public branchFactory: Branches;
+	private branchFactory: Branches;
 	@Inject(() => StatusBar)
-	public statusBarFactory: StatusBar;
+	private statusBarFactory: StatusBar;
 
 	private spawnResponse: string;
 	private branchName: string;
