@@ -117,7 +117,10 @@ export default class LogWidget extends List {
 					// @ts-ignore
 					el.setItems(this.readForUi(log));
 					el.select(0);
-					this.setStatusBarOnFocus();
+
+					if (this.screenFactory.curElement === "Log") {
+						this.setStatusBarOnFocus();
+					}
 
 					this.screenFactory.screen.render();
 				}
