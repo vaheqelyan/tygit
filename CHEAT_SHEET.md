@@ -31,7 +31,7 @@
 >  OSX <kbd>⌘</kbd> + <kbd>C</kbd>
 > </pre>
 
-> Add the letter a with a space before the message
+> Add the letter a with a space before the message. e.g. a Your commit
 
 ![](https://res.cloudinary.com/dmtrk3yns/image/upload/q_auto/v1541936550/tygit_cheat_sheet/v3.0.0/ezgif-6-37f84b26f16c.gif)
 
@@ -129,8 +129,8 @@ View the log of the current branch, limited to 35 messages
 ### Ignore untracked files
 
 > <pre>
->  Windows/Linux <kbd>L</kbd>
->  OSX <kbd>L</kbd>
+>  Windows/Linux + <kbd>L</kbd>
+>  OSX + <kbd>L</kbd>
 > </pre>
 
 Just press <kbd>i</kbd> in the list to ignore the selected file
@@ -140,10 +140,21 @@ Just press <kbd>i</kbd> in the list to ignore the selected file
 ### Remove files from the working tree and from the index
 
 > <pre>
->  Windows/Linux <kbd>R</kbd>
->  OSX <kbd>R</kbd>
+>  Windows/Linux + <kbd>R</kbd>
+>  OSX + <kbd>R</kbd>
 > </pre>
 
 Just press <kbd>r</kbd> in the list to remove the selected file
 
 ![](https://res.cloudinary.com/dmtrk3yns/image/upload/q_auto/v1541937687/tygit_cheat_sheet/v3.0.0/ezgif-6-a3b6084e4e31.gif)
+
+
+### Checkout (Discard changes in working directory)
+
+
+> <pre>
+>  Windows/Linux + <kbd>←</kbd>
+>  OSX + <kbd>←</kbd>
+> </pre>
+
+![](https://res.cloudinary.com/dmtrk3yns/image/upload/q_auto/v1542126185/tygit_cheat_sheet/v3.0.0/ezgif-6-0227280d487a.gif)
