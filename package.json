@@ -36,6 +36,7 @@
   "homepage": "https://github.com/vaheqelyan/tygit#readme",
   "dependencies": {
     "blessed": "^0.1.81",
+    "clipboardy": "^1.2.3",
     "fuzzysearch": "^1.0.3",
     "minimist": "^1.2.0",
     "reflect-metadata": "^0.1.12",
