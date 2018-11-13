@@ -1,6 +1,5 @@
 import Git from "./git";
 import Prompt from "./prompt";
-import Screen from "./screen";
 import StatusBar from "./statusBar";
 
 import { Inject, Service } from "typedi";

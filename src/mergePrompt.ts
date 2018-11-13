@@ -2,7 +2,6 @@ import { Inject } from "typedi";
 import Git from "./git";
 import MSG from "./messages/statusBar";
 import Prompt from "./prompt";
-import Screen from "./screen";
 import StatusBar from "./statusBar";
 
 class MergePrompt extends Prompt {

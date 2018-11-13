@@ -4,9 +4,7 @@ import DeleteBranchPrompt from "./DeleteBranchPrompt";
 import Git from "./git";
 import List from "./List";
 import LogWidget from "./log/logWidget";
-import Message from "./message";
 import Screen from "./screen";
-import StatusBar from "./statusBar";
 import SwitchBranch from "./switchBranch";
 
 class Branches extends List {
@@ -14,11 +12,7 @@ class Branches extends List {
 	private screen: Screen;
 	@Inject(() => Git)
 	private gitFactory: Git;
-	@Inject(() => StatusBar)
-	private statusBarFactory: StatusBar;
 
-	@Inject(() => Message)
-	private msgFactory: Message;
 	@Inject(() => BranchPrompt)
 	private branchPrompt: BranchPrompt;
 	@Inject(() => DeleteBranchPrompt)

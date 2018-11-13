@@ -1,7 +1,6 @@
 import { Inject } from "typedi";
 import Git from "./git";
 import Prompt from "./prompt";
-import Screen from "./screen";
 import Status from "./status";
 import StatusBar from "./statusBar";
 

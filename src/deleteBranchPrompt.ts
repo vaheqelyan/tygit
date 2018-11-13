@@ -3,7 +3,6 @@ import Branches from "./branch";
 import Git from "./git";
 import MSG from "./messages/statusBar";
 import Prompt from "./prompt";
-import Screen from "./screen";
 import StatusBar from "./statusBar";
 
 export default class DeleteBranchPrompt extends Prompt {

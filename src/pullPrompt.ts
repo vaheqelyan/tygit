@@ -1,22 +1,15 @@
 import * as fuzzysearch from "fuzzysearch";
 import { Inject } from "typedi";
 import Git from "./git";
-import Message from "./message";
 import MSG from "./messages/statusBar";
 import Prompt from "./prompt";
-import Screen from "./screen";
-import Status from "./status";
 import StatusBar from "./statusBar";
 
 class PullInput extends Prompt {
 	@Inject(() => Git)
 	private gitFactory: Git;
-	@Inject(() => Status)
-	private statusFactory: Status;
 	@Inject(() => StatusBar)
 	private statusBarFactory: StatusBar;
-	@Inject(() => Message)
-	private msgFactory: Message;
 
 	private spawnResponse: string;
 
