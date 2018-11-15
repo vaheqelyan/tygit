@@ -68,6 +68,31 @@ export default class ExecLog {
 		return logArray[getListItemIndex].hash;
 	}
 
+	public getStats() {
+		const { logWidgetFactory } = this;
+
+		const getStatusSelected = this.statusFactory.getSelectedFileName();
+
+		const logArray = this.gitFactory.logs.get(getStatusSelected);
+		// @ts-ignore
+		const getListItemIndex = logWidgetFactory.getElement().getItemIndex(logWidgetFactory.getItemText());
+
+		const getAfterChar = logArray[getListItemIndex].message.split("-");
+		return getAfterChar[getAfterChar.length - 1];
+	}
+
+	public bgetStats() {
+		const { logWidgetFactory } = this;
+		const getCurrentBranchName = this.gitFactory.getCurrentBranch();
+		const logArray = this.gitFactory.branchLogs.get(getCurrentBranchName);
+
+		// @ts-ignore
+		const getListItemIndex = logWidgetFactory.getElement().getItemIndex(logWidgetFactory.getItemText());
+
+		const getAfterChar = logArray[getListItemIndex].message.split("-");
+		return getAfterChar[getAfterChar.length - 1];
+	}
+
 	public getHashFromBranchLogMap(): string {
 		const { logWidgetFactory } = this;
 		const getCurrentBranchName = this.gitFactory.getCurrentBranch();
