@@ -1,12 +1,13 @@
 # Tygit
 
-```code
-npm i -g tygit
+![](https://res.cloudinary.com/dmtrk3yns/image/upload/q_auto:best/v1541687102/tygit/Shadow.jpg)
 
-tygit ../git-repo
+```console
+Admin@G50-70_W8_1LEG C:\Users\Admin
+> npm install -g tygit
+> tygit ../your-repo
 ```
 
-![](https://res.cloudinary.com/dmtrk3yns/image/upload/q_auto:best/v1541687102/tygit/Shadow.jpg)
 
 ### Features/Goals
 
