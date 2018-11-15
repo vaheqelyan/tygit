@@ -26,7 +26,10 @@ export default class LogWidget extends List {
 	private view: "file" | "branch";
 
 	public readForUi(logArray: ILog[]) {
-		return logArray.map(value => value.message);
+		return logArray.map(({ message }) => {
+			const b = message.split("-");
+			return b.slice(0, b.length - 1).join("-");
+		});
 	}
 
 	public onEnter = () => {
@@ -52,13 +55,15 @@ export default class LogWidget extends List {
 		element.setItems(this.readForUi(logArray));
 		element.select(0);
 
-		this.statusBarFactory.setTitle(this.colorizeLogStatus(this.getItemText()));
+		this.setStatusBarOnFocus();
 
 		this.screenFactory.screen.render();
 	};
 
 	public onSelect() {
-		this.statusBarFactory.setTitleAndRender(this.colorizeLogStatus(this.getItemText()));
+		const { logFactory } = this;
+		const res = this.view === "file" ? logFactory.getStats() : logFactory.bgetStats();
+		this.statusBarFactory.setTitleAndRender(res);
 	}
 
 	public logOnFocus = () => {
@@ -98,14 +103,13 @@ export default class LogWidget extends List {
 		const getText = this.getItemText();
 		if (getText) {
 			if (getText !== "Wait...") {
-				this.statusBarFactory.setTitle(this.colorizeLogStatus(getText));
+				if (this.view === "file") {
+					this.statusBarFactory.setTitle(this.logFactory.getStats());
+				} else {
+					this.statusBarFactory.setTitle(this.logFactory.bgetStats());
+				}
 			}
 		}
-	}
-
-	public colorizeLogStatus(str: string) {
-		const s1 = str.replace(/<(.*?)>/gi, "{bold}{blue-fg}<$1>{/}").replace(/\((.*?)\)/gi, "{bold}{green-fg}($1){/}");
-		return s1;
 	}
 
 	private observFn = (log: ILog[], file) => {
