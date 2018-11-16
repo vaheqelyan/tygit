@@ -1,6 +1,6 @@
 # Tygit
 
-![](https://res.cloudinary.com/dmtrk3yns/image/upload/q_auto:best/v1541687102/tygit/Shadow.jpg)
+![](https://res.cloudinary.com/dmtrk3yns/image/upload/q_auto:best/v1542381140/tygit/readme/shadow.jpg)
 
 ```console
 Admin@G50-70_W8_1LEG C:\Users\Admin
