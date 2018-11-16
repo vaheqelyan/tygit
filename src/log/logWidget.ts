@@ -74,6 +74,7 @@ export default class LogWidget extends List {
 			const getFlag = this.statusFactory.getFlag();
 			if (!/(UD|UA|AA|DD|D|A|\?\?)/g.test(getFlag)) {
 				if (!this.gitFactory.logs.has(selected)) {
+					this.disable();
 					this.view = "file";
 					// @ts-ignore
 					element.setItems(["Wait..."]);
@@ -83,7 +84,7 @@ export default class LogWidget extends List {
 					const getLogs = this.gitFactory.logs.get(selected);
 					// @ts-ignore
 					element.setItems(this.readForUi(getLogs));
-
+					this.enable();
 					element.select(0);
 				}
 
@@ -120,6 +121,7 @@ export default class LogWidget extends List {
 					const el = this.getElement();
 					// @ts-ignore
 					el.setItems(this.readForUi(log));
+					this.enable();
 					el.select(0);
 
 					if (this.screenFactory.curElement === "Log") {
